@@ -49,4 +49,4 @@ const studentSchema = new Schema<Student>({
 // creating model
 
 // const Student = model<Student>('Student', studentSchema); // Student name should be similar
-export const StudentModel = model<Student>('Student', studentSchema); // Changing student name as it is conflicting in service ts but keeping (student) same as it will create in database
+export const StudentModel = model<Student>('Student', studentSchema); // Changing student name as it is conflicting in service ts but keeping (student) same as it will create in database | i.e this Student name is changed by mongodb to Students

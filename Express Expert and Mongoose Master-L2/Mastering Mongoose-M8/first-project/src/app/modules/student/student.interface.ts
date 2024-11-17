@@ -3,7 +3,6 @@ import { Schema, model, connect } from 'mongoose';
 //modular pattern
 // interface - schema - model - dbQuery
 
-
 // 1. interface
 export type UserName = {
   firstName: string;
@@ -42,4 +41,4 @@ export type Student = {
   isActive: 'active' | 'blocked';
 };
 
-//2. scema 
+//2. scema

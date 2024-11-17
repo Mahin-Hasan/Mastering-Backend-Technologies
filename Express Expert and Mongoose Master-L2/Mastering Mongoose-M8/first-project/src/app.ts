@@ -1,6 +1,7 @@
 // const express = require("express");
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
+import { StudentRoute } from './app/modules/student/student.route';
 
 const app: Application = express();
 // const port = 3000;
@@ -9,15 +10,18 @@ const app: Application = express();
 app.use(express.json());
 app.use(cors());
 
+// Note: api calls studentroute->controller->service->database query
+//applicatoin routes
+app.use('/api/v1/students', StudentRoute);
+
+app.get('/', (req: Request, res: Response) => {
+  res.send('Hello Developer');
+});
 // const getAController = (req: Request, res: Response) => {
 //   res.send('Hello Developer');
 // }
 
 // app.get('/', getAController); // will work same
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello Developer');
-});
-
 // console.log(process.cwd());
 
 export default app;
