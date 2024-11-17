@@ -9,6 +9,11 @@ const app: Application = express();
 app.use(express.json());
 app.use(cors());
 
+// const getAController = (req: Request, res: Response) => {
+//   res.send('Hello Developer');
+// }
+
+// app.get('/', getAController); // will work same
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello Developer');
 });

@@ -1,6 +1,6 @@
 import { Schema, model, connect } from 'mongoose';
 
-//pattern
+//modular pattern
 // interface - schema - model - dbQuery
 
 
