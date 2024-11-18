@@ -20,12 +20,15 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "mongoose": "^8.8.1"
+    "joi": "^17.13.3",
+    "mongoose": "^8.8.1",
+    "validator": "^13.12.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/validator": "^13.12.2",
     "@typescript-eslint/eslint-plugin": "^8.14.0",
     "@typescript-eslint/parser": "^8.14.0",
     "eslint": "^9.14.0",

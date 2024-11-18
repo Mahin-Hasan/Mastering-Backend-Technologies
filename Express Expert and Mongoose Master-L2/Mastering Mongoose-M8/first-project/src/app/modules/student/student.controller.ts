@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { StudentServices } from './student.service';
+import Joi from 'joi';
+import studentValidationSchema from './student.validation';
 
 //controller func for POST
 const createStudent = async (req: Request, res: Response) => {
@@ -9,10 +11,20 @@ const createStudent = async (req: Request, res: Response) => {
 
     //can also be written using destructuring and name aliasing
     const { student: studentData } = req.body;
+    //validating using JOI
+    const { error } = studentValidationSchema.validate(studentData);
 
     //will call service func to send this data
     const result = await StudentServices.createStudentIntoDB(studentData); // aliased name is passed
     //send response
+    // console.log({value},{error});
+    if (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Something went wrong',
+        error: error.details, // can be written as only error as we are using es6
+      });
+    }
 
     // there are other method but we will follow this structure for sending data
     res.status(200).json({
@@ -20,8 +32,13 @@ const createStudent = async (req: Request, res: Response) => {
       message: 'Student is created sucessfully',
       data: result,
     });
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    // if we want to see error in response
+    res.status(500).json({
+      success: false,
+      message: 'Something went wrong',
+      error: err,
+    });
   }
 };
 //controller funch for GET all student
