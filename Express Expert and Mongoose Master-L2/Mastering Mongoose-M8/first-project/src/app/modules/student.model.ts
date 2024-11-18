@@ -8,9 +8,9 @@ import {
 
 //sub schema for cleaner code
 const userNameSchema = new Schema<UserName>({
-  firstName: { type: String, required: true },
+  firstName: { type: String, required: [true, 'First name must be provided'] }, // for setting up custom error message
   middleName: { type: String },
-  lastName: { type: String, required: true },
+  lastName: { type: String, required: [true, 'Last name must be provided'] },
 });
 
 const guardianSchema = new Schema<Guardian>({
@@ -30,20 +30,44 @@ const localGuardianSchema = new Schema<LocalGuardian>({
 
 //main schema
 const studentSchema = new Schema<Student>({
-  id: { type: String },
-  name: userNameSchema,
-  gender: ['male', 'female'],
+  id: { type: String, required: true, unique: true }, // unique true does not allow duplcate
+  name: {
+    type: userNameSchema,
+    required: true,
+  },
+  gender: {
+    type: String,
+    enum: {
+      values: ['male', 'female', 'other'],
+      message: '{VALUE} is not valid', // if we want to get user sent method and then send custom error message
+      //  message: "The gender field can only be one of the following 'male','female', or 'other'", // for enum custom message it should be given in value | message syntax //custom error message for value
+    },
+    required: [true, 'Gender field must be provided'], // custom error msg for field
+  },
   dateOfBirth: { type: String },
-  email: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   contactNo: { type: String, required: true },
   emergencyContactNo: { type: String, required: true },
-  bloodGroup: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+  bloodGroup: {
+    type: String,
+    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+  },
   presentAddress: { type: String, required: true },
   permanentAddress: { type: String, required: true },
-  guardian: guardianSchema,
-  localGuardian: localGuardianSchema,
+  guardian: {
+    type: guardianSchema,
+    required: true,
+  },
+  localGuardian: {
+    type: localGuardianSchema,
+    required: true,
+  },
   profileImg: { type: String },
-  isActive: ['active', 'blocked'],
+  isActive: {
+    type: String,
+    enum: ['active', 'blocked'],
+    default: 'active', // setting default value as active while creating
+  },
 });
 
 // creating model
