@@ -1,30 +1,41 @@
 import { Request, Response } from 'express';
 import { StudentServices } from './student.service';
 import Joi from 'joi';
-import studentValidationSchema from './student.validation';
+import studentValidationSchema from './student.joy.validation';
+import { z } from 'zod';
+import studentValidatoinSchemaZod from './student.validation';
 
 //controller func for POST
 const createStudent = async (req: Request, res: Response) => {
   // as we are handling async operation so it is better to use a try catch block
   try {
+    //creating a schema validation using ZOD
+    const studentValidationSchema = z
     // const student = req.body.student; // bz json file send as -> given in below
 
     //can also be written using destructuring and name aliasing
     const { student: studentData } = req.body;
+      //data validation using zod
+      const zodParsedData = studentValidatoinSchemaZod.parse(studentData)
+      const result = await StudentServices.createStudentIntoDB(zodParsedData);
+
     //validating using JOI
-    const { error } = studentValidationSchema.validate(studentData);
+    // const { error, value } = studentValidationSchema.validate(studentData); //validate warning will go if zod import is commented
 
     //will call service func to send this data
-    const result = await StudentServices.createStudentIntoDB(studentData); // aliased name is passed
+    // const result = await StudentServices.createStudentIntoDB(studentData); // aliased name is passed using regular system
+    // const result = await StudentServices.createStudentIntoDB(value); //make sure to send validated data for joy
+
     //send response
     // console.log({value},{error});
-    if (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Something went wrong',
-        error: error.details, // can be written as only error as we are using es6
-      });
-    }
+    //below commented error sending operation is for joy validation
+    // if (error) {
+    //   res.status(500).json({
+    //     success: false,
+    //     message: 'Something went wrong',
+    //     error: error.details, // can be written as only error as we are using es6
+    //   });
+    // }
 
     // there are other method but we will follow this structure for sending data
     res.status(200).json({

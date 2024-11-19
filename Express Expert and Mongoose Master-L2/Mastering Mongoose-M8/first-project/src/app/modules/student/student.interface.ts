@@ -1,12 +1,13 @@
 import { Schema, model, connect } from 'mongoose';
 
+//while using zod it will also find out type error from interface as well
 //modular pattern
 // interface - schema - model - dbQuery
 
 // 1. interface
 export type UserName = {
   firstName: string;
-  middleName: string;
+  middleName?: string;
   lastName: string;
 };
 export type Guardian = {
