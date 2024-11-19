@@ -2,15 +2,17 @@ import { Schema, model } from 'mongoose';
 import validator from 'validator';
 
 import {
-  Guardian,
-  LocalGuardian,
-  Student,
-  UserName,
+  TGuardian,
+  TLocalGuardian,
+  TStudent,
+  // StudentMethods, // used for custom instance
+  TUserName,
+  StudentModel,
 } from './student/student.interface';
 // NOTE: As we are using JOI validation library so we can remove all validator functions
 
 // Sub-schema for cleaner code
-const userNameSchema = new Schema<UserName>({
+const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
     required: [true, 'First name is required.'], // Custom error message for required
@@ -48,7 +50,7 @@ const userNameSchema = new Schema<UserName>({
   }, // Custom error message for required
 });
 
-const guardianSchema = new Schema<Guardian>({
+const guardianSchema = new Schema<TGuardian>({
   fatherName: { type: String, required: [true, 'Father name is required.'] },
   fatherOccupation: {
     type: String,
@@ -68,7 +70,7 @@ const guardianSchema = new Schema<Guardian>({
     required: [true, 'Mother contact number is required.'],
   },
 });
-const localGuardianSchema = new Schema<LocalGuardian>({
+const localGuardianSchema = new Schema<TLocalGuardian>({
   name: { type: String, required: [true, 'Local guardian name is required.'] },
   occupation: {
     type: String,
@@ -84,8 +86,11 @@ const localGuardianSchema = new Schema<LocalGuardian>({
   },
 });
 
-// Main schema
-const studentSchema = new Schema<Student>({
+//while using custom instance ->const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({ --> 3 params
+//while using custom static ->const studentSchema = new Schema<TStudent, StudentModel>({ --> 2 params
+
+// Main schema ||| importing StudentModel,StudentMethods from interface || after importing it will give an error for duplicate
+const studentSchema = new Schema<TStudent, StudentModel>({
   id: {
     type: String,
     required: [true, 'Student ID is required.'],
@@ -146,9 +151,22 @@ const studentSchema = new Schema<Student>({
   },
 });
 
-// Creating model
+//creating a static method
+studentSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await Student.findOne({ id });
+  return existingUser;
+};
+
+// Creating model instance
 // const Student = model<Student>('Student', studentSchema); // Student name should be similar
-export const StudentModel = model<Student>('Student', studentSchema); // Ensures consistency with MongoDB collection naming
+/*
+//testing created custom instance in student interface
+studentSchema.methods.isUserExists = async function (id: string) {
+  const existingUser = await Student.findOne({ id });
+  return existingUser;
+};
+*/
+export const Student = model<TStudent, StudentModel>('Student', studentSchema); // Ensures consistency with MongoDB collection naming
 
 // My types code
 

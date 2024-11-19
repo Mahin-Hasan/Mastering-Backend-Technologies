@@ -10,14 +10,14 @@ const createStudent = async (req: Request, res: Response) => {
   // as we are handling async operation so it is better to use a try catch block
   try {
     //creating a schema validation using ZOD
-    const studentValidationSchema = z
+    const studentValidationSchema = z;
     // const student = req.body.student; // bz json file send as -> given in below
 
     //can also be written using destructuring and name aliasing
     const { student: studentData } = req.body;
-      //data validation using zod
-      const zodParsedData = studentValidatoinSchemaZod.parse(studentData)
-      const result = await StudentServices.createStudentIntoDB(zodParsedData);
+    //data validation using zod
+    const zodParsedData = studentValidatoinSchemaZod.parse(studentData);
+    const result = await StudentServices.createStudentIntoDB(zodParsedData);
 
     //validating using JOI
     // const { error, value } = studentValidationSchema.validate(studentData); //validate warning will go if zod import is commented
@@ -43,11 +43,11 @@ const createStudent = async (req: Request, res: Response) => {
       message: 'Student is created sucessfully',
       data: result,
     });
-  } catch (err) {
+  } catch (err: any) {
     // if we want to see error in response
     res.status(500).json({
       success: false,
-      message: 'Something went wrong',
+      message: err.message || 'Something went wrong', // as used custom instance for checking user exist or not
       error: err,
     });
   }
