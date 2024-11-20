@@ -40,9 +40,28 @@ const deleteStudentFromDB = async (id: string) => {
   return result;
 };
 
+//trying update
+const updateStudentInDB = async (id: string, updateData: Partial<TStudent>) => {
+  // Check if the student exists
+  const existingStudent = await Student.findOne({ id });
+  if (!existingStudent) {
+    throw new Error('Student not found');
+  }
+
+  // Update the student data
+  const updatedStudent = await Student.findOneAndUpdate(
+    { id },
+    { $set: updateData },
+    { new: true, runValidators: true }, // Return the updated document and validate the update
+  );
+
+  return updatedStudent;
+};
+
 export const StudentServices = {
   createStudentIntoDB,
   getAllStudentsFromDB,
   getSingleStudentFromDB,
   deleteStudentFromDB,
+  updateStudentInDB,
 };

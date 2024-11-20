@@ -107,12 +107,42 @@ const deleteStudent = async (req: Request, res: Response) => {
     });
   }
 };
+//trying controller for update
+const updateStudent = async (req: Request, res: Response) => {
+  try {
+    const { studentId } = req.params; // Extract student ID from route params
+    const updateData = req.body; // Assume the updated fields are in the request body
 
+    // Validate the updateData using Zod (optional)
+    const parsedUpdateData = studentValidatoinSchemaZod
+      .partial()
+      .parse(updateData);
+
+    // Call the service method to update the student
+    const result = await StudentServices.updateStudentInDB(
+      studentId,
+      parsedUpdateData,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Student updated successfully',
+      data: result,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || 'Something went wrong',
+      error: err,
+    });
+  }
+};
 export const StudentControllers = {
   createStudent,
   getAllStudents,
   getSingleStudent,
-  deleteStudent
+  deleteStudent,
+  updateStudent,
 };
 //will be accessed from route
 
