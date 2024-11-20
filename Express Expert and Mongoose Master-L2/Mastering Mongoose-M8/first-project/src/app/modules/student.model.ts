@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
 import validator from 'validator';
+import bcrypt from 'bcrypt';
 
 import {
   TGuardian,
@@ -9,6 +10,7 @@ import {
   TUserName,
   StudentModel,
 } from './student/student.interface';
+import config from '../config';
 // NOTE: As we are using JOI validation library so we can remove all validator functions
 
 // Sub-schema for cleaner code
@@ -96,6 +98,12 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     required: [true, 'Student ID is required.'],
     unique: true,
   }, // Ensures unique ID
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    unique: true,
+    maxlength: [20, 'Password can not be more than 20 characters'],
+  },
   name: {
     type: userNameSchema,
     required: [true, 'Student name details are required.'],
@@ -149,6 +157,23 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     enum: ['active', 'blocked'],
     default: 'active', // Default value for new entries
   },
+});
+
+//pre save middleware/hook | will work on create() save()
+studentSchema.pre('save', async function (next) {
+  // console.log(this, 'pre hook : we will save data');
+
+  const user = this; // here this refers the post requested data
+  //hasing password and save into DB
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+  next()// must provide next function as pre is a midleware
+});
+//post save middleware/hook | pore
+studentSchema.post('save', function () {
+  console.log(this, 'post hook : we saved our data');
 });
 
 //creating a static method
