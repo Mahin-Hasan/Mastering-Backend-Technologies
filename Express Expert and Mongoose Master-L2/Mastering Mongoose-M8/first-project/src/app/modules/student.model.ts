@@ -92,74 +92,92 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 //while using custom static ->const studentSchema = new Schema<TStudent, StudentModel>({ --> 2 params
 
 // Main schema ||| importing StudentModel,StudentMethods from interface || after importing it will give an error for duplicate
-const studentSchema = new Schema<TStudent, StudentModel>({
-  id: {
-    type: String,
-    required: [true, 'Student ID is required.'],
-    unique: true,
-  }, // Ensures unique ID
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-    unique: true,
-    maxlength: [20, 'Password can not be more than 20 characters'],
-  },
-  name: {
-    type: userNameSchema,
-    required: [true, 'Student name details are required.'],
-  },
-  gender: {
-    type: String,
-    enum: {
-      values: ['male', 'female', 'other'],
-      message: '{VALUE} is not a valid gender.', // Custom error message for enum value
+const studentSchema = new Schema<TStudent, StudentModel>(
+  {
+    id: {
+      type: String,
+      required: [true, 'Student ID is required.'],
+      unique: true,
+    }, // Ensures unique ID
+    password: {
+      type: String,
+      required: [true, 'Password is required'],
+      maxlength: [20, 'Password can not be more than 20 characters'],
     },
-    required: [true, 'Gender is required.'], // Custom error message for required
-  },
-  dateOfBirth: { type: String },
-  email: {
-    type: String,
-    required: [true, 'Email address is required.'],
-    unique: true,
-    validate: {
-      validator: (value: string) => validator.isEmail(value),
-      message: '{VALUE} is not a valid email type',
+    name: {
+      type: userNameSchema,
+      required: [true, 'Student name details are required.'],
+    },
+    gender: {
+      type: String,
+      enum: {
+        values: ['male', 'female', 'other'],
+        message: '{VALUE} is not a valid gender.', // Custom error message for enum value
+      },
+      required: [true, 'Gender is required.'], // Custom error message for required
+    },
+    dateOfBirth: { type: String },
+    email: {
+      type: String,
+      required: [true, 'Email address is required.'],
+      unique: true,
+      validate: {
+        validator: (value: string) => validator.isEmail(value),
+        message: '{VALUE} is not a valid email type',
+      },
+    },
+    contactNo: {
+      type: String,
+      required: [true, 'Contact number is required.'],
+    },
+    emergencyContactNo: {
+      type: String,
+      required: [true, 'Emergency contact number is required.'],
+    },
+    bloodGroup: {
+      type: String,
+      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+    },
+    presentAddress: {
+      type: String,
+      required: [true, 'Present address is required.'],
+    },
+    permanentAddress: {
+      type: String,
+      required: [true, 'Permanent address is required.'],
+    },
+    guardian: {
+      type: guardianSchema,
+      required: [true, 'Guardian details are required.'],
+    },
+    localGuardian: {
+      type: localGuardianSchema,
+      required: [true, 'Local guardian details are required.'],
+    },
+    profileImg: { type: String },
+    isActive: {
+      type: String,
+      enum: ['active', 'blocked'],
+      default: 'active', // Default value for new entries
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
-  contactNo: { type: String, required: [true, 'Contact number is required.'] },
-  emergencyContactNo: {
-    type: String,
-    required: [true, 'Emergency contact number is required.'],
+  {
+    toJSON: {
+      virtuals: true,
+    },
   },
-  bloodGroup: {
-    type: String,
-    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-  },
-  presentAddress: {
-    type: String,
-    required: [true, 'Present address is required.'],
-  },
-  permanentAddress: {
-    type: String,
-    required: [true, 'Permanent address is required.'],
-  },
-  guardian: {
-    type: guardianSchema,
-    required: [true, 'Guardian details are required.'],
-  },
-  localGuardian: {
-    type: localGuardianSchema,
-    required: [true, 'Local guardian details are required.'],
-  },
-  profileImg: { type: String },
-  isActive: {
-    type: String,
-    enum: ['active', 'blocked'],
-    default: 'active', // Default value for new entries
-  },
+);
+
+// Virtual | must be enabled in main schema or else it will not work
+studentSchema.virtual('fullname').get(function () {
+  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
 });
 
-//pre save middleware/hook | will work on create() save()
+//pre save middleware/hook | will work on create() save() | known as document middleware bz 'save'
 studentSchema.pre('save', async function (next) {
   // console.log(this, 'pre hook : we will save data');
 
@@ -169,11 +187,36 @@ studentSchema.pre('save', async function (next) {
     user.password,
     Number(config.bcrypt_salt_rounds),
   );
-  next()// must provide next function as pre is a midleware
+  next(); // must provide next function as pre is a midleware
 });
 //post save middleware/hook | pore
-studentSchema.post('save', function () {
-  console.log(this, 'post hook : we saved our data');
+studentSchema.post('save', function (doc, next) {
+  // here doc is updated document
+  // console.log(this, 'post hook : we saved our data');
+
+  doc.password = ''; // will ensure that the password does not show in mongodb collection
+  next(); // must provide next function as post is a midleware
+});
+
+//query middleware
+
+studentSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } }); // it maintains a chaining with the find in service.ts | before executing the find in service this middle ware filters the data which has isDeleted as true || IMPORTANT: applied on 'find' need to handle for findOne i.e will work for get all student but will not work for getting single student
+  next();
+});
+//solving the issue of getting single data for findOne
+studentSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+//solving the issue of getting single data for aggregate by adding [{$match:{idDeleted:{$ne:true}}, { '$match': { id: '6969' }}}]
+studentSchema.pre('aggregate', function (next) {
+  // console.log(this.pipeline()); // [ { '$match': { id: '6969' } } ]
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } }); //unshift means insert at first
+
+  // this.pipeline({ isDeleted: { $ne: true } });
+  next();
 });
 
 //creating a static method
