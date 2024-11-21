@@ -19,6 +19,7 @@ const userSchema = new Schema<IUser>({
       },
       message: '{VALUE} is not a valid email',
     },
+    immutable:true,// email er value asholeo update korbe na part 5 23min
   },
   photo: String,
   role: {
@@ -32,6 +33,8 @@ const userSchema = new Schema<IUser>({
   },
   userStatus: { type: String, enum: ['active', 'inactive'], required: true },
 });
+
+//pre hook
 
 const User = model<IUser>('User', userSchema);
 export default User;

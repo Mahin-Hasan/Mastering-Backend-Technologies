@@ -17,10 +17,14 @@ const getSingleUser = async (id: string) => {
   return result;
 };
 const updateUser = async (id: string, data: IUser) => {
-  const result = await User.findByIdAndUpdate(id, data);
+  //   const result = await User.findByIdAndUpdate(id, data);//will show previous data before updating so need to fix
+  const result = await User.findByIdAndUpdate(id, data, {
+    new: true,
+  });
   return result;
 };
-const deleteUser = async (id: string) => { // make sure to delete by adding a flag and then conditionally render
+const deleteUser = async (id: string) => {
+  // make sure to delete by adding a flag and then conditionally render
   const result = await User.findByIdAndDelete(id);
   return result;
 };

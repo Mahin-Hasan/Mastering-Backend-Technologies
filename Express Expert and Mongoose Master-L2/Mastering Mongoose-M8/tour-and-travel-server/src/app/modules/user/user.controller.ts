@@ -41,9 +41,9 @@ const getUser = async (req: Request, res: Response) => {
 };
 const getSingleUser = async (req: Request, res: Response) => {
   try {
-    const userId = req.params.userId
+    const userId = req.params.userId;
     const result = await userService.getSingleUser(userId);
-    res.json({
+    res.send({
       success: true,
       message: 'User retrived successfully',
       result,
@@ -58,8 +58,10 @@ const getSingleUser = async (req: Request, res: Response) => {
 };
 const updateUser = async (req: Request, res: Response) => {
   try {
-    const result = await userService.updateUser();
-    res.json({
+    const userId = req.params.userId;
+    const body = req.body;
+    const result = await userService.updateUser(userId, body);
+    res.send({
       success: true,
       message: 'User updated successfully',
       result,
@@ -74,11 +76,12 @@ const updateUser = async (req: Request, res: Response) => {
 };
 const deleteUser = async (req: Request, res: Response) => {
   try {
-    const result = await userService.deleteUser();
-    res.json({
+    const userId = req.params.userId;
+    await userService.deleteUser(userId);
+    res.send({
       success: true,
       message: 'User updated successfully',
-      result,
+      result: {},
     });
   } catch (err) {
     res.status(500).json({
@@ -92,5 +95,7 @@ const deleteUser = async (req: Request, res: Response) => {
 export const userController = {
   createUser,
   getUser,
-  getSingleUser
+  getSingleUser,
+  updateUser,
+  deleteUser,
 };
