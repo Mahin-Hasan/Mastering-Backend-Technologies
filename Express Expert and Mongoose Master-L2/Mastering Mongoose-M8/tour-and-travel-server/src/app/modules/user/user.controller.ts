@@ -1,14 +1,16 @@
 // handling req and res
 
 import { Request, Response } from 'express';
-import User from './user.model';
+import { userService } from './user.service';
 
 const createUser = async (req: Request, res: Response) => {
   try {
     const userData = req.body;
-    const result = await User.create(userData);
+
+    const result = await userService.createUser(userData);
 
     res.json({
+      success: true,
       message: 'User created successfully',
       data: result,
     });
@@ -22,16 +24,73 @@ const createUser = async (req: Request, res: Response) => {
 };
 
 const getUser = async (req: Request, res: Response) => {
-  const userData = req.body;
-  const result = await User.create(userData);
-
-  res.json({
-    message: 'User created successfully',
-    data: result,
-  });
+  try {
+    const result = await userService.getUser();
+    res.json({
+      success: true,
+      message: 'User retrived successfully',
+      result,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Something went wrong',
+      error: err,
+    });
+  }
+};
+const getSingleUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId
+    const result = await userService.getSingleUser(userId);
+    res.json({
+      success: true,
+      message: 'User retrived successfully',
+      result,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Something went wrong',
+      error: err,
+    });
+  }
+};
+const updateUser = async (req: Request, res: Response) => {
+  try {
+    const result = await userService.updateUser();
+    res.json({
+      success: true,
+      message: 'User updated successfully',
+      result,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Something went wrong',
+      error: err,
+    });
+  }
+};
+const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const result = await userService.deleteUser();
+    res.json({
+      success: true,
+      message: 'User updated successfully',
+      result,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'Something went wrong',
+      error: err,
+    });
+  }
 };
 
 export const userController = {
   createUser,
   getUser,
+  getSingleUser
 };

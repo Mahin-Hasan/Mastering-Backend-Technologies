@@ -1,11 +1,12 @@
 import { model, Schema } from 'mongoose';
+import { IUser } from './user.interface';
 
-const userSchema = new Schema({
+const userSchema = new Schema<IUser>({
   name: {
     type: String,
     required: [true, 'Please provide your name'],
-    maxLength: [20,'name too long'],
-    minLength: [3,'Name is too short'],
+    maxLength: [20, 'name too long'],
+    minLength: [3, 'Name is too short'],
   },
   age: { type: Number, required: [true, 'Please enter your age'] },
   email: {
@@ -26,10 +27,11 @@ const userSchema = new Schema({
       values: ['user', 'admin'],
       message: '{VALUE} is not a valid. please provide a valid user',
     },
+    default: 'user', //setting role as user by default 
     required: true,
   },
   userStatus: { type: String, enum: ['active', 'inactive'], required: true },
 });
 
-const User = model('User', userSchema);
+const User = model<IUser>('User', userSchema);
 export default User;
