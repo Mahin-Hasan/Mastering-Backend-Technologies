@@ -25,10 +25,21 @@ const deleteTour = async (id: string) => {
   return result;
 };
 
+const getNextSchedule = async (id: string) => {
+  const tour = await Tour.findById(id); //need to define interface or will give error
+  const nextSchedule = tour?.getNextNearestStartDateAndEndData();
+
+  return {
+    tour,
+    nextSchedule,
+  };
+};
+
 export const tourService = {
   createTour,
   getTours,
   getSingleTour,
   updateTour,
   deleteTour,
+  getNextSchedule,
 };

@@ -95,10 +95,31 @@ const deleteTour = async (req: Request, res: Response) => {
   }
 };
 
+//custom
+const getNextSchedule = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const result = await tourService.getNextSchedule(id);
+
+    res.send({
+      success: true,
+      message: 'Tour dates found successfully',
+      result,
+    });
+  } catch (error) {
+    res.send({
+      success: false,
+      message: 'Something went wrong',
+      error,
+    });
+  }
+};
+
 export const tourController = {
   createTour,
   getTours,
   getSingleTour,
   updateTour,
   deleteTour,
+  getNextSchedule,
 };
