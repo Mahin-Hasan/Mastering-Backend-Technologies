@@ -9,8 +9,8 @@ import {
   // StudentMethods, // used for custom instance
   TUserName,
   StudentModel,
-} from './student/student.interface';
-import config from '../config';
+} from './student.interface';
+import config from '../../config';
 // NOTE: As we are using JOI validation library so we can remove all validator functions
 
 // Sub-schema for cleaner code
