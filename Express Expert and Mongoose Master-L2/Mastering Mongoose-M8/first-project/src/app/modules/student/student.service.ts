@@ -1,6 +1,7 @@
 import { Student } from './student.model';
 import { TStudent } from './student.interface';
 
+/*refactoring to user service
 const createStudentIntoDB = async (studentData: TStudent) => {
   // const result = await StudentModel.create(student); // build in static method
 
@@ -19,10 +20,13 @@ const createStudentIntoDB = async (studentData: TStudent) => {
   } //our created custom instance must be passed in model.ts
   const result = await student.save(); // build in instance method
 
-  */
+  / add *
 
   return result;
 };
+
+
+*/
 
 const getAllStudentsFromDB = async () => {
   const result = await Student.find();
@@ -59,7 +63,7 @@ const updateStudentInDB = async (id: string, updateData: Partial<TStudent>) => {
 };
 
 export const StudentServices = {
-  createStudentIntoDB,
+  // createStudentIntoDB,
   getAllStudentsFromDB,
   getSingleStudentFromDB,
   deleteStudentFromDB,

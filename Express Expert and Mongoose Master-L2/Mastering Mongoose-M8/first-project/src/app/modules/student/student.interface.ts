@@ -1,4 +1,4 @@
-import { Schema, model, connect, Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 //while using zod it will also find out type error from interface as well | duplication error arise in StudentModel in model so add T in front using F2
 //modular pattern
@@ -27,6 +27,7 @@ export type TLocalGuardian = {
 
 export type TStudent = {
   id: string;
+  user: Types.ObjectId;
   password: string;
   name: TUserName;
   gender: 'male' | 'female' | 'other';
@@ -40,7 +41,7 @@ export type TStudent = {
   guardian: TGuardian;
   localGuardian: TLocalGuardian;
   profileImg?: string;
-  isActive: 'active' | 'blocked';
+  // isActive: 'active' | 'blocked';
   isDeleted: boolean;
 };
 

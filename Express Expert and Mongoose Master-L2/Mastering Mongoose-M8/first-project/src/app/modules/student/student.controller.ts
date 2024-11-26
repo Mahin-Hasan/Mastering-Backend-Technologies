@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
 import { StudentServices } from './student.service';
 import Joi from 'joi';
-import studentValidationSchema from './student.joy.validation';
+// import studentValidationSchema from './student.joy.validation';
 import { z } from 'zod';
 import studentValidatoinSchemaZod from './student.validation';
 
 //controller func for POST
+
+/* NOTE: refactoriong code we will create this in user Controller
 const createStudent = async (req: Request, res: Response) => {
   // as we are handling async operation so it is better to use a try catch block
   try {
@@ -52,6 +54,8 @@ const createStudent = async (req: Request, res: Response) => {
     });
   }
 };
+*/
+
 //controller funch for GET all student
 const getAllStudents = async (req: Request, res: Response) => {
   try {
@@ -138,7 +142,7 @@ const updateStudent = async (req: Request, res: Response) => {
   }
 };
 export const StudentControllers = {
-  createStudent,
+  // createStudent,
   getAllStudents,
   getSingleStudent,
   deleteStudent,
