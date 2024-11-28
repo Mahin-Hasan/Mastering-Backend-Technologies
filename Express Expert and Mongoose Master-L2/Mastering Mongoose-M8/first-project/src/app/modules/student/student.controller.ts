@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { StudentServices } from './student.service';
-import Joi from 'joi';
+// import Joi from 'joi';
 // import studentValidationSchema from './student.joy.validation';
-import { z } from 'zod';
+// import { z } from 'zod';
 import studentValidatoinSchemaZod from './student.validation';
 
 //controller func for POST
@@ -57,7 +57,11 @@ const createStudent = async (req: Request, res: Response) => {
 */
 
 //controller funch for GET all student
-const getAllStudents = async (req: Request, res: Response) => {
+const getAllStudents = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await StudentServices.getAllStudentsFromDB();
     res.status(200).json({
@@ -65,16 +69,21 @@ const getAllStudents = async (req: Request, res: Response) => {
       message: 'Students are retrived sucessfully',
       data: result,
     });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message || 'Something went wrong',
-      error: err,
-    });
+  } catch (err) {
+    // res.status(500).json({
+    //   success: false,
+    //   message: err.message || 'Something went wrong',
+    //   error: err,
+    // });
+    next(err);
   }
 };
 //controller for get single student
-const getSingleStudent = async (req: Request, res: Response) => {
+const getSingleStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     //getting single student from stored id not mongoDb id
     //   const studentId = req.params.studentId //can be written as this remember studentId name shoulbe be same route file
@@ -85,16 +94,21 @@ const getSingleStudent = async (req: Request, res: Response) => {
       message: 'Single student retrived sucessfully',
       data: result,
     });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message || 'Something went wrong',
-      error: err,
-    });
+  } catch (err) {
+    // res.status(500).json({
+    //   success: false,
+    //   message: err.message || 'Something went wrong',
+    //   error: err,
+    // });
+    next(err);
   }
 };
 //controller for deleting student
-const deleteStudent = async (req: Request, res: Response) => {
+const deleteStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { studentId } = req.params;
     const result = await StudentServices.deleteStudentFromDB(studentId);
@@ -103,16 +117,21 @@ const deleteStudent = async (req: Request, res: Response) => {
       message: 'Student is deleted sucessfully',
       data: result,
     });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message || 'Something went wrong',
-      error: err,
-    });
+  } catch (err) {
+    // res.status(500).json({
+    //   success: false,
+    //   message: err.message || 'Something went wrong',
+    //   error: err,
+    // });
+    next(err);
   }
 };
 //trying controller for update
-const updateStudent = async (req: Request, res: Response) => {
+const updateStudent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { studentId } = req.params; // Extract student ID from route params
     const updateData = req.body; // Assume the updated fields are in the request body
@@ -133,12 +152,13 @@ const updateStudent = async (req: Request, res: Response) => {
       message: 'Student updated successfully',
       data: result,
     });
-  } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      message: err.message || 'Something went wrong',
-      error: err,
-    });
+  } catch (err) {
+    // res.status(500).json({
+    //   success: false,
+    //   message: err.message || 'Something went wrong',
+    //   error: err,
+    // });
+    next(err);
   }
 };
 export const StudentControllers = {

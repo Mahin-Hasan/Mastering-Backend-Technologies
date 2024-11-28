@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import validator from 'validator';
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
 
 import {
   TGuardian,
@@ -105,11 +105,11 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       unique: true,
       ref: 'User', // ensures connection with user student model
     },
-    password: {
-      type: String,
-      required: [true, 'Password is required'],
-      maxlength: [20, 'Password can not be more than 20 characters'],
-    },
+    // password: {
+    //   type: String,
+    //   required: [true, 'Password is required'],
+    //   maxlength: [20, 'Password can not be more than 20 characters'],
+    // },
     name: {
       type: userNameSchema,
       required: [true, 'Student name details are required.'],
@@ -184,25 +184,25 @@ studentSchema.virtual('fullname').get(function () {
 });
 
 //pre save middleware/hook | will work on create() save() | known as document middleware bz 'save'
-studentSchema.pre('save', async function (next) {
-  // console.log(this, 'pre hook : we will save data');
+// studentSchema.pre('save', async function (next) {
+//   // console.log(this, 'pre hook : we will save data');
 
-  const user = this; // here this refers the post requested data
-  //hasing password and save into DB
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_rounds),
-  );
-  next(); // must provide next function as pre is a midleware
-});
-//post save middleware/hook | pore
-studentSchema.post('save', function (doc, next) {
-  // here doc is updated document
-  // console.log(this, 'post hook : we saved our data');
+//   const user = this; // here this refers the post requested data
+//   //hasing password and save into DB
+//   user.password = await bcrypt.hash(
+//     user.password,
+//     Number(config.bcrypt_salt_rounds),
+//   );
+//   next(); // must provide next function as pre is a midleware
+// });
+// //post save middleware/hook | pore
+// studentSchema.post('save', function (doc, next) {
+//   // here doc is updated document
+//   // console.log(this, 'post hook : we saved our data');
 
-  doc.password = ''; // will ensure that the password does not show in mongodb collection
-  next(); // must provide next function as post is a midleware
-});
+//   doc.password = ''; // will ensure that the password does not show in mongodb collection
+//   next(); // must provide next function as post is a midleware
+// });
 
 //query middleware
 
