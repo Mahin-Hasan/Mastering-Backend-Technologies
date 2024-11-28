@@ -4,6 +4,9 @@ import { StudentServices } from './student.service';
 // import studentValidationSchema from './student.joy.validation';
 // import { z } from 'zod';
 import studentValidatoinSchemaZod from './student.validation';
+import sendResponse from '../../utils/sendResponse';
+// @ts-ignore
+import httpStatus from 'http-status';
 
 //controller func for POST
 
@@ -64,7 +67,13 @@ const getAllStudents = async (
 ) => {
   try {
     const result = await StudentServices.getAllStudentsFromDB();
-    res.status(200).json({
+    // res.status(200).json({
+    //   success: true,
+    //   message: 'Students are retrived sucessfully',
+    //   data: result,
+    // });
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
       success: true,
       message: 'Students are retrived sucessfully',
       data: result,
@@ -89,7 +98,13 @@ const getSingleStudent = async (
     //   const studentId = req.params.studentId //can be written as this remember studentId name shoulbe be same route file
     const { studentId } = req.params;
     const result = await StudentServices.getSingleStudentFromDB(studentId);
-    res.status(200).json({
+    // res.status(200).json({
+    //   success: true,
+    //   message: 'Single student retrived sucessfully',
+    //   data: result,
+    // });
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
       success: true,
       message: 'Single student retrived sucessfully',
       data: result,
