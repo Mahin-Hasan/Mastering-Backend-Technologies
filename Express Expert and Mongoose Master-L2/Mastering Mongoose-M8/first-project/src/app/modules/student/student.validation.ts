@@ -50,39 +50,85 @@ const localGuardianValidationSchema = z.object({
   address: z.string().min(1, { message: 'Local guardian address is required' }),
 });
 
-// Main Student schema
-const studentValidatoinSchemaZod = z.object({
-  id: z.string().min(1, { message: 'Student ID is required' }),
-  password: z
-    .string()
-    .max(20, { message: 'Password can not be more than 20 characters' }),
-  name: userNameValidationSchema,
-  gender: z.enum(['male', 'female', 'other'], {
-    message: 'Invalid gender value',
+// Main Student schema prev
+// const studentValidatoinSchemaZod = z.object({
+//   id: z.string().min(1, { message: 'Student ID is required' }),
+//   password: z
+//     .string()
+//     .max(20, { message: 'Password can not be more than 20 characters' }),
+//   name: userNameValidationSchema,
+//   gender: z.enum(['male', 'female', 'other'], {
+//     message: 'Invalid gender value',
+//   }),
+//   dateOfBirth: z.string().optional(),
+//   email: z
+//     .string()
+//     .min(1, { message: 'Email address is required' })
+//     .email({ message: 'Invalid email format' }),
+//   contactNo: z.string().min(1, { message: 'Contact number is required' }),
+//   emergencyContactNo: z
+//     .string()
+//     .min(1, { message: 'Emergency contact number is required' }),
+//   bloodGroup: z
+//     .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], {
+//       message: 'Invalid blood group value',
+//     })
+//     .optional(),
+//   presentAddress: z.string().min(1, { message: 'Present address is required' }),
+//   permanentAddress: z
+//     .string()
+//     .min(1, { message: 'Permanent address is required' }),
+//   guardian: guardianValidationSchema,
+//   localGuardian: localGuardianValidationSchema,
+//   profileImg: z.string().optional(),
+//   isActive: z.enum(['active', 'blocked']).default('active'),
+//   isDeleted: z.boolean().default(false),
+// });
+
+// export default studentValidatoinSchemaZod;
+
+//need to change structure and store parsed data in body obj as in user route validation middleware || i.e data should be inside body obj
+const createStudentValidatoinSchemaZod = z.object({
+  body: z.object({
+    // id: z.string().min(1, { message: 'Student ID is required' }),
+    password: z
+      .string()
+      .max(20, { message: 'Password can not be more than 20 characters' }),
+    student: z.object({
+      name: userNameValidationSchema,
+      gender: z.enum(['male', 'female', 'other'], {
+        message: 'Invalid gender value',
+      }),
+      dateOfBirth: z.string().optional(),
+      email: z
+        .string()
+        .min(1, { message: 'Email address is required' })
+        .email({ message: 'Invalid email format' }),
+      contactNo: z.string().min(1, { message: 'Contact number is required' }),
+      emergencyContactNo: z
+        .string()
+        .min(1, { message: 'Emergency contact number is required' }),
+      bloodGroup: z
+        .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], {
+          message: 'Invalid blood group value',
+        })
+        .optional(),
+      presentAddress: z
+        .string()
+        .min(1, { message: 'Present address is required' }),
+      permanentAddress: z
+        .string()
+        .min(1, { message: 'Permanent address is required' }),
+      guardian: guardianValidationSchema,
+      localGuardian: localGuardianValidationSchema,
+      profileImg: z.string().optional(),
+    }),
+    // isActive: z.enum(['active', 'blocked']).default('active'),
+    // isDeleted: z.boolean().default(false), // commenting bz it is transferred to user model
   }),
-  dateOfBirth: z.string().optional(),
-  email: z
-    .string()
-    .min(1, { message: 'Email address is required' })
-    .email({ message: 'Invalid email format' }),
-  contactNo: z.string().min(1, { message: 'Contact number is required' }),
-  emergencyContactNo: z
-    .string()
-    .min(1, { message: 'Emergency contact number is required' }),
-  bloodGroup: z
-    .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], {
-      message: 'Invalid blood group value',
-    })
-    .optional(),
-  presentAddress: z.string().min(1, { message: 'Present address is required' }),
-  permanentAddress: z
-    .string()
-    .min(1, { message: 'Permanent address is required' }),
-  guardian: guardianValidationSchema,
-  localGuardian: localGuardianValidationSchema,
-  profileImg: z.string().optional(),
-  isActive: z.enum(['active', 'blocked']).default('active'),
-  isDeleted: z.boolean().default(false),
 });
 
-export default studentValidatoinSchemaZod;
+//need to chage structure bz zod validation are performed in route middleware
+export const studentValidatoins = {
+  createStudentValidatoinSchemaZod,
+};
