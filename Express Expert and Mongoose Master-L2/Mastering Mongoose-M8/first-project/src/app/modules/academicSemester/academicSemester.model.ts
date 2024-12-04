@@ -38,7 +38,26 @@ const academicSemesterSchema = new Schema<TAcademicSemester>(
   },
 );
 
+//middleware to ensure same semester cannot be created multiple times in same year || Functionality 1
+academicSemesterSchema.pre('save', async function (next) {
+  const isSemesterExists = await AcademicSemester.findOne({
+    year: this.year,
+    name: this.name,
+  });
+  if (isSemesterExists) {
+    throw new Error('Semester already Exists !!!');
+  }
+  next();
+});
+
 export const AcademicSemester = model<TAcademicSemester>(
   'AcademicSemester',
   academicSemesterSchema,
 );
+
+
+/*
+Functionality
+1. In same year two same semester cannot be created || setting name as unique true will not solve the issue cz next year Autumn semester will be offered once again
+2. Autum code should be 1 Fall Summar 2 Fall 3
+*/
