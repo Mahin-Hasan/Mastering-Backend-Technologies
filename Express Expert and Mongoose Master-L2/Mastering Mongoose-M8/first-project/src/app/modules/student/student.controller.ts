@@ -3,11 +3,12 @@ import { StudentServices } from './student.service';
 // import Joi from 'joi';
 // import studentValidationSchema from './student.joy.validation';
 // import { z } from 'zod';
-import studentValidatoinSchemaZod from './student.validation';
+// import studentValidatoinSchemaZod from './student.validation'; || prev zod
 import sendResponse from '../../utils/sendResponse';
 // @ts-ignore
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
+import { studentValidatoins } from './student.validation';
 
 //controller func for POST
 
@@ -108,7 +109,12 @@ const updateStudent: RequestHandler = catchAsync(async (req, res) => {
   const updateData = req.body; // Assume the updated fields are in the request body
 
   // Validate the updateData using Zod (optional)
-  const parsedUpdateData = studentValidatoinSchemaZod
+  /*
+  const parsedUpdateData = studentValidatoinSchemaZod // prevz zod
+    .partial()
+    .parse(updateData);
+  */
+  const parsedUpdateData = studentValidatoins.createStudentValidatoinSchemaZod
     .partial()
     .parse(updateData);
 
