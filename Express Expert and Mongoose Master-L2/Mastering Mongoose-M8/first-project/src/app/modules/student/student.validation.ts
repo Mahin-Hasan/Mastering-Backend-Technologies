@@ -99,7 +99,7 @@ const createStudentValidatoinSchemaZod = z.object({
       gender: z.enum(['male', 'female', 'other'], {
         message: 'Invalid gender value',
       }),
-      dateOfBirth: z.string().optional(),
+      dateOfBirth: z.date().optional(),
       email: z
         .string()
         .min(1, { message: 'Email address is required' })
