@@ -67,5 +67,5 @@ export const StudentServices = {
   getAllStudentsFromDB,
   getSingleStudentFromDB,
   deleteStudentFromDB,
-  updateStudentInDB,
+  // updateStudentInDB,
 };

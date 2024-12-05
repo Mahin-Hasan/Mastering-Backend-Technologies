@@ -42,6 +42,7 @@ export type TStudent = {
   localGuardian: TLocalGuardian;
   profileImg?: string;
   // isActive: 'active' | 'blocked';
+  admissionSemester:Types.ObjectId;// ObjectId Ref for academic semester
   isDeleted: boolean;
 };
 

@@ -3,7 +3,7 @@ import { StudentServices } from './student.service';
 // import Joi from 'joi';
 // import studentValidationSchema from './student.joy.validation';
 // import { z } from 'zod';
-// import studentValidatoinSchemaZod from './student.validation'; || prev zod
+// import studentValidatoinSchemaZod from './student.validation'; // prev zod
 import sendResponse from '../../utils/sendResponse';
 // @ts-ignore
 import httpStatus from 'http-status';
@@ -103,20 +103,23 @@ const deleteStudent: RequestHandler = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 //trying controller for update
+//commenting update controller and fix error
+/*
 const updateStudent: RequestHandler = catchAsync(async (req, res) => {
   const { studentId } = req.params; // Extract student ID from route params
   const updateData = req.body; // Assume the updated fields are in the request body
 
   // Validate the updateData using Zod (optional)
-  /*
+
   const parsedUpdateData = studentValidatoinSchemaZod // prevz zod
     .partial()
     .parse(updateData);
-  */
-  const parsedUpdateData = studentValidatoins.createStudentValidatoinSchemaZod
-    .partial()
-    .parse(updateData);
+
+  // const parsedUpdateData = studentValidatoins.createStudentValidatoinSchemaZod
+  //   .partial()
+  //   .parse(updateData);
 
   // Call the service method to update the student
   const result = await StudentServices.updateStudentInDB(
@@ -131,12 +134,13 @@ const updateStudent: RequestHandler = catchAsync(async (req, res) => {
     data: result,
   });
 });
+*/
 export const StudentControllers = {
   // createStudent,
   getAllStudents,
   getSingleStudent,
   deleteStudent,
-  updateStudent,
+  // updateStudent,
 };
 //will be accessed from route
 

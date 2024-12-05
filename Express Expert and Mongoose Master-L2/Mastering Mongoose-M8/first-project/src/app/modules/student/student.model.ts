@@ -122,7 +122,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       },
       required: [true, 'Gender is required.'], // Custom error message for required
     },
-    dateOfBirth: { type: String },
+    dateOfBirth: { type: Date },
     email: {
       type: String,
       required: [true, 'Email address is required.'],
@@ -166,6 +166,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     //   enum: ['active', 'blocked'],
     //   default: 'active', // Default value for new entries
     // },
+    admissionSemester: { type: Schema.Types.ObjectId, ref: 'AcademicSemester' },
     isDeleted: {
       type: Boolean,
       default: false,

@@ -1,5 +1,8 @@
 import { academicSemesterNameCodeMapper } from './academicSemester.constant';
-import { TAcademicSemester, TAcademicSemesterNameCodeMapper } from './academicSemester.interface';
+import {
+  TAcademicSemester,
+  TAcademicSemesterNameCodeMapper,
+} from './academicSemester.interface';
 import { AcademicSemester } from './academicSemester.model';
 
 const createAcademicSemesterIntoDB = async (payload: TAcademicSemester) => {
@@ -13,16 +16,26 @@ const createAcademicSemesterIntoDB = async (payload: TAcademicSemester) => {
 
   //using mapped types declared in interface || code refactored to constant
 
-
   //academicSemesterNameCodeMapper['Fall'] -> ie 3 !== sent code in apiDog ex 02 is given then it will give error
-  if(academicSemesterNameCodeMapper[payload.name] !== payload.code){
-    throw new Error('Invalid Semester Code')
+  if (academicSemesterNameCodeMapper[payload.name] !== payload.code) {
+    throw new Error('Invalid Semester Code');
   }
 
   const result = await AcademicSemester.create(payload);
   return result;
 };
+const getAllAcademicSemesterFromDB = async () => {
+  const result = await AcademicSemester.find();
+  return result;
+};
+
+const getSingleAcademicSemesterFromDB = async (id: string) => {
+  const result = await AcademicSemester.findById(id);
+  return result;
+};
 
 export const AcademicSemesterServices = {
   createAcademicSemesterIntoDB,
+  getAllAcademicSemesterFromDB,
+  getSingleAcademicSemesterFromDB,
 };

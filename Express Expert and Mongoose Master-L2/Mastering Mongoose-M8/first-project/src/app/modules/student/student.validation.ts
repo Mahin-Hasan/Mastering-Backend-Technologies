@@ -121,6 +121,7 @@ const createStudentValidatoinSchemaZod = z.object({
         .min(1, { message: 'Permanent address is required' }),
       guardian: guardianValidationSchema,
       localGuardian: localGuardianValidationSchema,
+      admissionSemester: z.string(),
       profileImg: z.string().optional(),
     }),
     // isActive: z.enum(['active', 'blocked']).default('active'),
