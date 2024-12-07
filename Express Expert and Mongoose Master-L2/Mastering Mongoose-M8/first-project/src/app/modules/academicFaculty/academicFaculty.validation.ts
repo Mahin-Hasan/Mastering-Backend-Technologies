@@ -1,13 +1,18 @@
 import { z } from 'zod';
 
+//must maintain body structure as declared in validation
 const createAcademicFacultyValidatoinSchema = z.object({
-  name: z.string({
-    invalid_type_error: 'Academic Faculty must be string',
+  body: z.object({
+    name: z.string({
+      invalid_type_error: 'Academic Faculty must be string',
+    }),
   }),
 });
 const updateAcademicFacultyValidatoinSchema = z.object({
-  name: z.string({
-    invalid_type_error: 'Academic Faculty must be string',
+  body: z.object({
+    name: z.string({
+      invalid_type_error: 'Academic Faculty must be string',
+    }),
   }),
 });
 
