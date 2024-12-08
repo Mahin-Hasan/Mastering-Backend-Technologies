@@ -2,6 +2,8 @@
 
 import express from 'express';
 import { StudentControllers } from './student.controller';
+import validateRequest from '../../middlewares/validateRequest';
+import { studentValidatoins } from './student.validation';
 
 const router = express.Router();
 
@@ -11,6 +13,8 @@ const router = express.Router();
 router.get('/', StudentControllers.getAllStudents);
 router.get('/:studentId', StudentControllers.getSingleStudent);
 router.delete('/:studentId', StudentControllers.deleteStudent);
+router.patch('/:studentId',validateRequest(studentValidatoins.updateStudentValidatoinSchemaZod), StudentControllers.updateStudent); // Update API
+
 //trying update
 //router.put('/:studentId', StudentControllers.updateStudent); // Update API
 

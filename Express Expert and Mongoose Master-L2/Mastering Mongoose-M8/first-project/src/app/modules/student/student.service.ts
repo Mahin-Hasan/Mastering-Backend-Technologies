@@ -1,5 +1,10 @@
 import { Student } from './student.model';
 import { TStudent } from './student.interface';
+import mongoose from 'mongoose';
+import AppError from '../../errors/AppError';
+import { User } from '../user/user.model';
+// @ts-ignore
+import httpStatus from 'http-status';
 
 /*refactoring to user service
 const createStudentIntoDB = async (studentData: TStudent) => {
@@ -47,7 +52,7 @@ const getSingleStudentFromDB = async (id: string) => {
   // const result = await Student.aggregate([{ $match: { id: id } }]);
 
   //doing same operation using findbyId
-  const result = await Student.findById(id)
+  const result = await Student.findOne({ id }) // not using findById bz we are using out custom generated ID
     .populate('admissionSemester')
     .populate({
       path: 'academicDepartment',
@@ -57,13 +62,49 @@ const getSingleStudentFromDB = async (id: string) => {
     });
   return result;
 };
+//without transaction rollback
+/*
 const deleteStudentFromDB = async (id: string) => {
   const result = await Student.updateOne({ id }, { isDeleted: true }); // we will call update bz it will create an incostincy in database
   return result;
 };
+*/
+//with transaction and rollback || using isDeleted property is available both in user and student model
+const deleteStudentFromDB = async (id: string) => {
+  const session = await mongoose.startSession();
+  //add check id exist or not validation
+  try {
+    session.startTransaction();
+    // we will call update bz it will create an incostincy in database || we will use findOneAndUpdate bz we are trying to perform delete operation in out custom created id | we can use findById if we use mongodb generated object id
+    const deletedStudent = await Student.findOneAndUpdate(
+      { id },
+      { isDeleted: true },
+      { new: true, session }, // in create we pass in array [] in update we pass in obj
+    );
+    if (!deletedStudent) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete student');
+    }
+    const deletedUser = await User.findOneAndUpdate(
+      { id },
+      { isDeleted: true },
+      { new: true, session }, // in create we pass in array [] in update we pass in obj
+    );
+    if (!deletedUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
+    }
+
+    await session.commitTransaction(); //save changes to DB
+    await session.endSession();
+
+    return deletedStudent;
+  } catch (error) {
+    await session.abortTransaction(); //abort changes to DB
+    await session.endSession();
+  }
+};
 
 //trying update
-const updateStudentInDB = async (id: string, updateData: Partial<TStudent>) => {
+const updateStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
   // Check if the student exists
   const existingStudent = await Student.findOne({ id });
   if (!existingStudent) {
@@ -73,8 +114,8 @@ const updateStudentInDB = async (id: string, updateData: Partial<TStudent>) => {
   // Update the student data
   const updatedStudent = await Student.findOneAndUpdate(
     { id },
-    { $set: updateData },
-    { new: true, runValidators: true }, // Return the updated document and validate the update
+    payload, // if PUT is used then we have to use $set
+    { new: true }, // Return the updated document and validate the update
   );
 
   return updatedStudent;
@@ -85,5 +126,5 @@ export const StudentServices = {
   getAllStudentsFromDB,
   getSingleStudentFromDB,
   deleteStudentFromDB,
-  // updateStudentInDB,
+  updateStudentIntoDB,
 };
