@@ -100,6 +100,7 @@ const deleteStudentFromDB = async (id: string) => {
   } catch (error) {
     await session.abortTransaction(); //abort changes to DB
     await session.endSession();
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete Student'); // must throw error or else api will not give proper response
   }
 };
 
@@ -111,15 +112,69 @@ const updateStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
     throw new Error('Student not found');
   }
 
-  // Update the student data
+  //seperating primitve and non primitive data for solving immutable issue
+  /*
+  example for use case
+  //updating like this will make data muted
+  guardian:{
+  fatherOccupation:"Teacher"
+  }
+  //updating like this will work without muting the data
+  guardian.fatherOccupation= "Teacher"
+  //so we need to transform
+  */
+
+  const { name, guardian, localGuardian, ...remainingStudentData } = payload;
+
+  const modifiedUpdateData: Record<string, unknown> = {
+    ...remainingStudentData,
+  };
+
+  //transforming name to name.firstName= "Mahin"
+  if (name && Object.keys(name).length) {
+    for (const [key, value] of Object.entries(name)) {
+      modifiedUpdateData[`name.${key}`] = value;// { 'name.lastName': 'Hasann' }
+    }
+  }
+  //transforming Guardian to guardian.firstName= "rocky"
+  if (guardian && Object.keys(guardian).length) {
+    for (const [key, value] of Object.entries(guardian)) {
+      modifiedUpdateData[`guardian.${key}`] = value;
+    }
+  }
+  //transforming localGuardian to localGuardian.firstName= "rocky"
+  if (localGuardian && Object.keys(localGuardian).length) {
+    for (const [key, value] of Object.entries(localGuardian)) {
+      modifiedUpdateData[`localGuardian.${key}`] = value;
+    }
+  }
+  console.log(modifiedUpdateData);
+  // Update the student data without mutable check
+  // const updatedStudent = await Student.findOneAndUpdate(
+  //   { id },
+  //   payload, // if PUT is used then we have to use $set
+  //   { new: true }, // Return the updated document and validate the update
+  // );
+  //update student data with mutable check
   const updatedStudent = await Student.findOneAndUpdate(
     { id },
-    payload, // if PUT is used then we have to use $set
-    { new: true }, // Return the updated document and validate the update
+    modifiedUpdateData, // if PUT is used then we have to use $set
+    { new: true, runValidators: true }, // Return the updated document and validate the update
   );
 
   return updatedStudent;
 };
+/*
+update body
+// updating non primitive will make collection muted bz name is a non-primitive field
+{
+    "student": {
+        "name": {
+            "lastName": "Hasan"
+        }
+    }
+}
+*/
 
 export const StudentServices = {
   // createStudentIntoDB,
