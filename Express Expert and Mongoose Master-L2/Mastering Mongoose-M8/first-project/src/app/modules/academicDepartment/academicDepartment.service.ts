@@ -1,8 +1,16 @@
-import { TAcademicDepartment } from "./academicDepartment.interface";
-import { AcademicDepartment } from "./academicDepartment.model";
-
+import { TAcademicDepartment } from './academicDepartment.interface';
+import { AcademicDepartment } from './academicDepartment.model';
 
 const createAcademicDepartmentIntoDB = async (payload: TAcademicDepartment) => {
+  /*
+// handling duplicate department check using querying
+  const isDepartmentExist = await AcademicDepartment.findOne({name:payload.name})
+  
+  if(isDepartmentExist){
+    throw new Error('This department already exists !!')
+  }
+  */
+
   const result = await AcademicDepartment.create(payload);
   return result;
 };
@@ -21,9 +29,13 @@ const updateAcademicDepartmentIntoDB = async (
   id: string,
   payload: Partial<TAcademicDepartment>,
 ) => {
-  const result = await AcademicDepartment.findOneAndUpdate({ _id: id }, payload, {
-    new: true,
-  });
+  const result = await AcademicDepartment.findOneAndUpdate(
+    { _id: id },
+    payload,
+    {
+      new: true,
+    },
+  );
   return result;
 };
 
