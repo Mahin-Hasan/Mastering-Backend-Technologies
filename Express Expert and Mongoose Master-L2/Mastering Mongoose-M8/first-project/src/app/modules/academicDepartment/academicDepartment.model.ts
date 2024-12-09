@@ -20,7 +20,7 @@ const academicDepartmentSchema = new Schema<TAcademicDepartment>(
   },
 );
 
-// handling duplicate department check using pre middleware
+// handling duplicate department check using pre middleware || if this middleware is commented then mongoose validation will show error response
 academicDepartmentSchema.pre('save', async function (next) {
   const isDepartmentExist = await AcademicDepartment.findOne({
     name: this.name,
