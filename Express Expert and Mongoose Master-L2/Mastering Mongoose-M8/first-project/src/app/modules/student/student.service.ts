@@ -32,7 +32,8 @@ const createStudentIntoDB = async (studentData: TStudent) => {
 
 
 */
-
+//get all without query
+/*
 const getAllStudentsFromDB = async () => {
   const result = await Student.find()
     .populate('admissionSemester')
@@ -43,6 +44,60 @@ const getAllStudentsFromDB = async () => {
       },
     }); // nesting bz student refer department and dept refer faculty
   return result;
+};
+*/
+const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
+  console.log('base query', query);
+  const queryObj = { ...query }; // creating a copy so than main query does not become muted
+
+  //need to craete a dynamic maping so that data can be retrived from this pattern
+  // {email:{ $regex : query.searchTerm, $options: i }}
+  // {name:{ $regex : query.searchTerm, $options: i }}
+  // {presentAddress:{ $regex : query.searchTerm, $options: i }}
+
+  //checking query exists or not || here searchTerm will work as partial search and email will work as exact match
+  const studentSearchableFields = ['email', 'name.firstName', 'presentAddress'];
+  let searchTerm = '';
+  if (query?.searchTerm) {
+    searchTerm = query?.searchTerm as string; // as string bz we know we will pass string as query param
+  }
+  //chaining searchQuery for better readability
+  const searchQuery = Student.find({
+    $or: studentSearchableFields.map((field) => ({
+      [field]: { $regex: searchTerm, $options: 'i' },
+    })),
+  });
+
+  //filtering
+  const excludeFields = ['searchTerm', 'sort', 'limit'];
+
+  excludeFields.forEach((el) => delete queryObj[el]);
+  // console.log({query,queryObj});
+
+  const filterQuery = searchQuery
+    .find(queryObj)
+    .populate('admissionSemester')
+    .populate({
+      path: 'academicDepartment',
+      populate: {
+        path: 'academicFaculty',
+      },
+    }); // nesting bz student refer department and dept refer faculty
+
+  let sort = '-createdAt';
+  if (query.sort) {
+    sort = query.sort as string;
+  }
+
+  const sortQuery = filterQuery.sort(sort); // remove await when sorting
+
+  let limit = 1;
+  if (query.limit) {
+    limit = query.limit as number;
+  }
+  const limitQuery = await sortQuery.limit(limit);
+
+  return limitQuery;
 };
 
 const getSingleStudentFromDB = async (id: string) => {
@@ -133,7 +188,7 @@ const updateStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
   //transforming name to name.firstName= "Mahin"
   if (name && Object.keys(name).length) {
     for (const [key, value] of Object.entries(name)) {
-      modifiedUpdateData[`name.${key}`] = value;// { 'name.lastName': 'Hasann' }
+      modifiedUpdateData[`name.${key}`] = value; // { 'name.lastName': 'Hasann' }
     }
   }
   //transforming Guardian to guardian.firstName= "rocky"

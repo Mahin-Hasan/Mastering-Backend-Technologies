@@ -69,8 +69,9 @@ const createStudent = async (req: Request, res: Response) => {
 
 //controller funch for GET all student
 const getAllStudents = catchAsync(async (req, res) => {
-  const result = await StudentServices.getAllStudentsFromDB();
-
+  //testing searchTerm query
+ // console.log(req.query); //{ searchTerm: 'rav' }
+  const result = await StudentServices.getAllStudentsFromDB(req.query); //passing query to service
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -83,6 +84,7 @@ const getAllStudents = catchAsync(async (req, res) => {
 const getSingleStudent = catchAsync(async (req, res) => {
   //getting single student from stored id not mongoDb id
   //   const studentId = req.params.studentId //can be written as this remember studentId name should be same route file
+
   const { studentId } = req.params;
   const result = await StudentServices.getSingleStudentFromDB(studentId);
   sendResponse(res, {

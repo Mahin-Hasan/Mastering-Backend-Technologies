@@ -40,4 +40,4 @@ process.on('uncaughtException', () => {
   process.exit(1);
 });
 
-console.log(a); // will trigger uncaught Exception
+// console.log(a); // will trigger uncaught Exception
