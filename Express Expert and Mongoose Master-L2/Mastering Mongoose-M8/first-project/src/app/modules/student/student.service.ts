@@ -5,6 +5,8 @@ import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 // @ts-ignore
 import httpStatus from 'http-status';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { studentSearchableFields } from './student.constant';
 
 /*refactoring to user service
 const createStudentIntoDB = async (studentData: TStudent) => {
@@ -122,72 +124,26 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
 */
 // get all students with QueryBuilder
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-  // console.log('base query', query);
-  const queryObj = { ...query }; // creating a copy so than main query does not become muted
+  const studentQuery = new QueryBuilder(
+    Student.find()
+      .populate('admissionSemester')
+      .populate({
+        path: 'academicDepartment',
+        populate: {
+          path: 'academicFaculty',
+        },
+      }),
+    query,
+  )
+    .search(studentSearchableFields)
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+  //use populate
 
-
-
-  //checking query exists or not || here searchTerm will work as partial search and email will work as exact match
-  const studentSearchableFields = ['email', 'name.firstName', 'presentAddress'];
-  let searchTerm = '';
-  if (query?.searchTerm) {
-    searchTerm = query?.searchTerm as string; // as string bz we know we will pass string as query param
-  }
-  //chaining searchQuery for better readability
-  const searchQuery = Student.find({
-    $or: studentSearchableFields.map((field) => ({
-      [field]: { $regex: searchTerm, $options: 'i' },
-    })),
-  });
-
-  //filtering
-  const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
-
-  excludeFields.forEach((el) => delete queryObj[el]);
- 
-
-  const filterQuery = searchQuery
-    .find(queryObj)
-    .populate('admissionSemester')
-    .populate({
-      path: 'academicDepartment',
-      populate: {
-        path: 'academicFaculty',
-      },
-    }); // nesting bz student refer department and dept refer faculty
-
-  let sort = '-createdAt';
-  if (query.sort) {
-    sort = query.sort as string;
-  }
-
-  const sortQuery = filterQuery.sort(sort); // remove await when sorting
-
-  //setting default value
-  let page = 1;
-  let limit = 1;
-  let skip = 0;
-  if (query.page) {
-    page = Number(query.page);
-  }
-  if (query.limit) {
-    limit = Number(query.limit);
-  }
-  const paginateQuery = sortQuery.skip(skip);
-
-  const limitQuery = paginateQuery.limit(limit);
-
-  //field limiting
-  let fields = '-__v'; //ommiting by default response __v
-  if (query.fields) {
-    //structure query: { fields: 'name,email' } } || ie fields: 'name,email should be converted to fields: 'name email' as documented in mongoose
-    fields = (query.fields as string).split(',').join(' '); //'name email'
-    console.log(fields);
-  }
-
-  const fieldQuery = await limitQuery.select(fields);
-
-  return fieldQuery;
+  const result = await studentQuery.modelQuery;
+  return result;
 };
 const getSingleStudentFromDB = async (id: string) => {
   // const result = await Student.findOne({ id }); // note: StudentModel name changed to Student
