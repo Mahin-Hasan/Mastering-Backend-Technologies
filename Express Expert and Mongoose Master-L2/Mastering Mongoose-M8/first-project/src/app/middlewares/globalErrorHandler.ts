@@ -40,11 +40,13 @@ import handleZodError from '../errors/handleZodError';
 import handleValidationError from '../errors/handleValidationError';
 import handleCastError from '../errors/handleCastError';
 import handleDuplicateError from '../errors/handleDuplicateError';
+import AppError from '../errors/AppError';
 
+// Used for handling errors that are encountered in Express application
 const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   //setting default values
-  let statusCode = err.statusCode || 500;
-  let message = err.message || 'Something went wrong!';
+  let statusCode = 500;
+  let message = 'Something went wrong!';
 
   let errorSources: TErrorSources = [
     {
@@ -82,7 +84,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     errorSources = simplifiedError?.errorSources;
   } else if (err?.name === 'CastError') {
     //detect cast error
-    // console.log('This is mongoose validation error');
+    // console.log('This is cast validation error');
 
     const simplifiedError = handleCastError(err);
     statusCode = simplifiedError?.statusCode;
@@ -90,12 +92,35 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     errorSources = simplifiedError?.errorSources;
   } else if (err?.code === 11000) {
     //detect mongoose duplicate error when unique declared in model
-    // console.log('This is mongoose validation error');
+    // console.log('This is dupli validation error');
 
     const simplifiedError = handleDuplicateError(err);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
+  } else if (err instanceof AppError) {
+    //detect class AppError
+    // console.log('This is class error ex Error | AppError');
+
+    statusCode = err?.statusCode;
+    message = err?.message;
+    errorSources = [
+      {
+        path: '',
+        message: err?.message,
+      },
+    ];
+  } else if (err instanceof Error) {
+    //detect class Error
+    // console.log('This is class error ex Error | AppError');
+    // will get status code from default that is set in above
+    message = err?.message;
+    errorSources = [
+      {
+        path: '',
+        message: err?.message,
+      },
+    ];
   }
 
   //remove return to solve error || final returned error message

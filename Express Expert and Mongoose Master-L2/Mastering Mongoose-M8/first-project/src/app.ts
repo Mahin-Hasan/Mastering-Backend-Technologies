@@ -22,7 +22,12 @@ app.use(cors());
 // Refactoring routes
 app.use('/api/v1', router);
 
+//creating a route to test unhandled promise error
+const test = async (req: Request, res: Response) => {
+  Promise.reject();// intentionally creating error | will trigger unhandled rejection
+};
 
+app.get('/test', test); // gives error UnhandledPromiseRejection
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello Developer');
 });
@@ -37,5 +42,5 @@ app.get('/', (req: Request, res: Response) => {
 app.use(globalErrorHandler);
 //Not Found -> if we want to give json error respose instead of HTML pattern
 // @ts-ignore -> for overload function error
-app.use(notFound)
+app.use(notFound);
 export default app;
