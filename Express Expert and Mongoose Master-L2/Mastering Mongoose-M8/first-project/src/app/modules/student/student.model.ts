@@ -182,7 +182,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
 
 // Virtual | must be enabled in main schema or else it will not work
 studentSchema.virtual('fullname').get(function () {
-  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
+  return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
 });
 
 //pre save middleware/hook | will work on create() save() | known as document middleware bz 'save'

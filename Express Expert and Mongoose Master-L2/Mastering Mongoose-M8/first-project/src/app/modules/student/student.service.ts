@@ -47,7 +47,7 @@ const getAllStudentsFromDB = async () => {
 };
 */
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-  console.log('base query', query);
+  // console.log('base query', query);
   const queryObj = { ...query }; // creating a copy so than main query does not become muted
 
   //need to craete a dynamic maping so that data can be retrived from this pattern
@@ -69,10 +69,10 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   });
 
   //filtering
-  const excludeFields = ['searchTerm', 'sort', 'limit'];
+  const excludeFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
 
   excludeFields.forEach((el) => delete queryObj[el]);
-  // console.log({query,queryObj});
+  console.log({ query }, { queryObj });
 
   const filterQuery = searchQuery
     .find(queryObj)
@@ -91,13 +91,31 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
 
   const sortQuery = filterQuery.sort(sort); // remove await when sorting
 
+  //setting default value
+  let page = 1;
   let limit = 1;
-  if (query.limit) {
-    limit = query.limit as number;
+  let skip = 0;
+  if (query.page) {
+    page = Number(query.page);
   }
-  const limitQuery = await sortQuery.limit(limit);
+  if (query.limit) {
+    limit = Number(query.limit);
+  }
+  const paginateQuery = sortQuery.skip(skip);
 
-  return limitQuery;
+  const limitQuery = paginateQuery.limit(limit);
+
+  //field limiting
+  let fields = '-__v'; //ommiting by default response __v
+  if (query.fields) {
+    //structure query: { fields: 'name,email' } } || ie fields: 'name,email should be converted to fields: 'name email' as documented in mongoose
+    fields = (query.fields as string).split(',').join(' '); //'name email'
+    console.log(fields);
+  }
+
+  const fieldQuery = await limitQuery.select(fields);
+
+  return fieldQuery;
 };
 
 const getSingleStudentFromDB = async (id: string) => {
