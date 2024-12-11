@@ -67,10 +67,18 @@ const createStudent = async (req: Request, res: Response) => {
 //   };
 // };
 
+/*
+
+#############
+for custom generated route use: const { studentId } = req.params;
+for mongodb generated route use: const { id } = req.params;
+#############
+
+*/
 //controller funch for GET all student
 const getAllStudents = catchAsync(async (req, res) => {
   //testing searchTerm query
- // console.log(req.query); //{ searchTerm: 'rav' }
+  // console.log(req.query); //{ searchTerm: 'rav' }
   const result = await StudentServices.getAllStudentsFromDB(req.query); //passing query to service
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -85,8 +93,9 @@ const getSingleStudent = catchAsync(async (req, res) => {
   //getting single student from stored id not mongoDb id
   //   const studentId = req.params.studentId //can be written as this remember studentId name should be same route file
 
-  const { studentId } = req.params;
-  const result = await StudentServices.getSingleStudentFromDB(studentId);
+  // const { studentId } = req.params; for generated student Id
+  const { id } = req.params; // for mongo db generated ID
+  const result = await StudentServices.getSingleStudentFromDB(id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -96,8 +105,8 @@ const getSingleStudent = catchAsync(async (req, res) => {
 });
 //controller for deleting student
 const deleteStudent: RequestHandler = catchAsync(async (req, res) => {
-  const { studentId } = req.params;
-  const result = await StudentServices.deleteStudentFromDB(studentId);
+  const { id } = req.params;
+  const result = await StudentServices.deleteStudentFromDB(id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -106,9 +115,9 @@ const deleteStudent: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 const updateStudent: RequestHandler = catchAsync(async (req, res) => {
-  const { studentId } = req.params;
+  const { id } = req.params;
   const { student } = req.body;
-  const result = await StudentServices.updateStudentIntoDB(studentId, student);
+  const result = await StudentServices.updateStudentIntoDB(id, student);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

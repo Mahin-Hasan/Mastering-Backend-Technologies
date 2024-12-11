@@ -145,14 +145,35 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   const result = await studentQuery.modelQuery;
   return result;
 };
+/*
+//get single studnet with our generated Id
 const getSingleStudentFromDB = async (id: string) => {
   // const result = await Student.findOne({ id }); // note: StudentModel name changed to Student
 
   //doing the same operation using aggregate pipe line
   // const result = await Student.aggregate([{ $match: { id: id } }]);
 
-  //doing same operation using findbyId
+  //doing same operation using findOne
   const result = await Student.findOne({ id }) // not using findById bz we are using out custom generated ID
+    .populate('admissionSemester')
+    .populate({
+      path: 'academicDepartment',
+      populate: {
+        path: 'academicFaculty',
+      },
+    });
+  return result;
+};
+*/
+//get single studnet with mongoose id
+const getSingleStudentFromDB = async (id: string) => {
+  // const result = await Student.findOne({ id }); // note: StudentModel name changed to Student
+
+  //doing the same operation using aggregate pipe line
+  // const result = await Student.aggregate([{ $match: { id: id } }]);
+
+  //doing same operation using findById
+  const result = await Student.findById(id) // not using findOne bz we are mongoDB generated ID
     .populate('admissionSemester')
     .populate({
       path: 'academicDepartment',
@@ -176,16 +197,38 @@ const deleteStudentFromDB = async (id: string) => {
   try {
     session.startTransaction();
     // we will call update bz it will create an incostincy in database || we will use findOneAndUpdate bz we are trying to perform delete operation in out custom created id | we can use findById if we use mongodb generated object id
-    const deletedStudent = await Student.findOneAndUpdate(
+
+    //delete student using out generated id
+    /*
+      const deletedStudent = await Student.findOneAndUpdate(
       { id },
       { isDeleted: true },
       { new: true, session }, // in create we pass in array [] in update we pass in obj
     );
+    */
+    //delete student using mongoDb generated Id
+    const deletedStudent = await Student.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true, session }, // in create we pass in array [] in update we pass in obj
+    );
+
     if (!deletedStudent) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete student');
     }
+    //delete user using our custom generated Id
+    /*
     const deletedUser = await User.findOneAndUpdate(
       { id },
+      { isDeleted: true },
+      { new: true, session }, // in create we pass in array [] in update we pass in obj
+    );
+  */
+    //delete user using mongoDb generated ID
+    const userId = deletedStudent.user;
+    const deletedUser = await User.findByIdAndUpdate(
+      //soft delete so updating
+      userId,
       { isDeleted: true },
       { new: true, session }, // in create we pass in array [] in update we pass in obj
     );
@@ -256,8 +299,17 @@ const updateStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
   //   { new: true }, // Return the updated document and validate the update
   // );
   //update student data with mutable check
-  const updatedStudent = await Student.findOneAndUpdate(
+  //update using our generated ID
+  /*
+   const updatedStudent = await Student.findOneAndUpdate(
     { id },
+    modifiedUpdateData, // if PUT is used then we have to use $set
+    { new: true, runValidators: true }, // Return the updated document and validate the update
+  );
+  */
+  //update using mongoDB generated id
+  const updatedStudent = await Student.findByIdAndUpdate(
+    id,
     modifiedUpdateData, // if PUT is used then we have to use $set
     { new: true, runValidators: true }, // Return the updated document and validate the update
   );
