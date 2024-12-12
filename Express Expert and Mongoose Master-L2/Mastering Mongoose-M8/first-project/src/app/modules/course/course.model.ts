@@ -1,6 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { TCourse, TPreRequisiteCourses } from './course.interface';
 
+// basic update and array update will take place in this course model
 const preRequisiteCoursesSchema = new Schema<TPreRequisiteCourses>({
   course: {
     type: Schema.Types.ObjectId,
