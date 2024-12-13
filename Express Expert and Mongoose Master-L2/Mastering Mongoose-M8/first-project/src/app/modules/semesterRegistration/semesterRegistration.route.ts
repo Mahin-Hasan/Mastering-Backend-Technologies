@@ -16,7 +16,13 @@ router.get(
   '/:id',
   SemesterRegistrationController.getSingleSemesterRegistration,
 );
-router.patch('/:id', SemesterRegistrationController.updateSemesterRegistration);
+router.patch(
+  '/:id',
+  validateRequest(
+    SemesterRegistrationValidation.updateSemesterRegistrationValidatoinSchema,
+  ),
+  SemesterRegistrationController.updateSemesterRegistration,
+);
 router.get('/', SemesterRegistrationController.getAllSemesterRegistration);
 
 //delete should not be used as other model are depended in semester registration

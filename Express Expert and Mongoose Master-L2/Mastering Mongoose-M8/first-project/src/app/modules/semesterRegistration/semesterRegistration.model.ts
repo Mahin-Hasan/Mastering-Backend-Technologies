@@ -6,7 +6,7 @@ import { SemesterRegistrationStatus } from './semesterRegistration.constant';
 const semesterRegistrationSchema = new mongoose.Schema<TSemesterRegistration>(
   {
     academicSemester: {
-      type: Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId, // will be sent from frontEnd || this id will be any stored academicSemester collection id
       required: true,
       unique: true, // for every registration academic semester will be unique
       ref: 'AcademicSemester',

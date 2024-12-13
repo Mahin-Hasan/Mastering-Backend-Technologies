@@ -227,7 +227,7 @@ studentSchema.pre('aggregate', function (next) {
   next();
 });
 
-//creating a static method
+//creating a static method to check is user exist
 studentSchema.statics.isUserExists = async function (id: string) {
   const existingUser = await Student.findOne({ id });
   return existingUser;
