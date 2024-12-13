@@ -19,8 +19,18 @@ router.patch(
   validateRequest(CourseValidations.updateCourseValidationSchema),
   CourseControllers.updateCourse,
 );
-//put used for specific purpose
-router.put('/:courseId/assign-faculties', CourseControllers.getSingleCourse);
+//put used for specific purpose | ie. if exist than update if does not exist then create
+router.put(
+  '/:courseId/assign-faculties',
+  validateRequest(CourseValidations.facultiesWithCourseValidationSchema),
+  CourseControllers.assignFacultiesWithCourse,
+);
+//remove faculties route
+router.delete(
+  '/:courseId/remove-faculties',
+  validateRequest(CourseValidations.facultiesWithCourseValidationSchema),
+  CourseControllers.removeFacultiesFromCourse,
+);
 
 router.get('/', CourseControllers.getAllCourses);
 

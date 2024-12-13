@@ -32,8 +32,17 @@ const updateCourseValidationSchema = z.object({
     isDeleted: z.boolean().optional(),
   }),
 });
+
+//validation for assign faculty | must be inside body
+const facultiesWithCourseValidationSchema = z.object({
+  body: z.object({
+    faculties: z.array(z.string()),
+  }),
+});
+
 // const updateCourseValidationSchema = createCourseValidationSchema.partial; // not standared bz only type level will become optional but it validation level it will remain required field
 export const CourseValidations = {
   createCourseValidationSchema,
   updateCourseValidationSchema,
+  facultiesWithCourseValidationSchema,
 };

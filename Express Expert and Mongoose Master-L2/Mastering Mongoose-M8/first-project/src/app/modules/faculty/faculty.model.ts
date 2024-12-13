@@ -81,7 +81,7 @@ const facultySchema = new Schema<TFaculty, FacultyModel>(
     academicDepartment: {
       type: Schema.Types.ObjectId,
       required: [true, 'User id is required'],
-      ref: 'User', // must use ref or else populate will not work
+      ref: 'AcademicDepartment', // must use ref or else populate will not work
     },
     isDeleted: {
       type: Boolean,

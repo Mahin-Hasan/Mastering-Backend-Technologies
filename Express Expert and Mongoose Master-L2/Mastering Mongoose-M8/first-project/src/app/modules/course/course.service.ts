@@ -131,10 +131,28 @@ const assignFacultiesWithCourseIntoDB = async (
   const result = await CourseFaculty.findByIdAndUpdate(
     id,
     {
+      course: id,
       $addToSet: { faculties: { $each: payload } }, //$addToSet to ensure newly created and is not dubplicate, each bz there can be multiple fields | faculties name of property where it will set
     },
     {
       upsert: true, // first time akta course er jonno akta faculty create korsi but 2nd time we will assign faculty to the already created course || I.e in same course multiple faculty can be assigned
+      new: true, // get updated data
+    },
+  );
+  return result;
+};
+
+const removeFacultiesFromCourseFromDB = async (
+  id: string,
+  payload: Partial<TCourseFaculty>,
+) => {
+  //INFO: Here payload is a passed id
+  const result = await CourseFaculty.findByIdAndUpdate(
+    id,
+    {
+      $pull: { faculties: { $in: payload } }, // pulling from faculties declared in model schema
+    },
+    {
       new: true, // get updated data
     },
   );
@@ -148,4 +166,5 @@ export const CourseServices = {
   deleteCourseFromDB,
   updateCourseIntoDB,
   assignFacultiesWithCourseIntoDB,
+  removeFacultiesFromCourseFromDB,
 };
