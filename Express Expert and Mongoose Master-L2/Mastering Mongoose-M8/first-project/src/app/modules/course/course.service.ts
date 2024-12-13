@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { CourseSearchableFields } from './course.constant';
-import { TCourse } from './course.interface';
-import { Course } from './course.model';
+import { TCourse, TCourseFaculty } from './course.interface';
+import { Course, CourseFaculty } from './course.model';
 import AppError from '../../errors/AppError';
 //@ts-ignore
 import httpStatus from 'http-status';
@@ -124,10 +124,28 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
   }
 };
 
+const assignFacultiesWithCourseIntoDB = async (
+  id: string,
+  payload: Partial<TCourseFaculty>,
+) => {
+  const result = await CourseFaculty.findByIdAndUpdate(
+    id,
+    {
+      $addToSet: { faculties: { $each: payload } }, //$addToSet to ensure newly created and is not dubplicate, each bz there can be multiple fields | faculties name of property where it will set
+    },
+    {
+      upsert: true, // first time akta course er jonno akta faculty create korsi but 2nd time we will assign faculty to the already created course || I.e in same course multiple faculty can be assigned
+      new: true, // get updated data
+    },
+  );
+  return result;
+};
+
 export const CourseServices = {
   createCourseIntoDB,
   getAllCoursesFromDB,
   getSingleCourse,
   deleteCourseFromDB,
   updateCourseIntoDB,
+  assignFacultiesWithCourseIntoDB,
 };

@@ -19,6 +19,8 @@ router.patch(
   validateRequest(CourseValidations.updateCourseValidationSchema),
   CourseControllers.updateCourse,
 );
+//put used for specific purpose
+router.put('/:courseId/assign-faculties', CourseControllers.getSingleCourse);
 
 router.get('/', CourseControllers.getAllCourses);
 
