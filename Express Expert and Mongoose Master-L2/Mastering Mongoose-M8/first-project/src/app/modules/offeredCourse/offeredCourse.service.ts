@@ -16,6 +16,7 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
     academicDepartment,
     course,
     faculty,
+    section,
   } = payload;
   // as we are not sending academicSemester from frontEnd we will need to check if the semester registration id isExist
   const isSemesterRegistrationExists =
@@ -51,6 +52,38 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Faculty not found !');
   }
 
+  /*
+  1. academic faculty er moddhe onek gula academin department thake | faculty of engineering -> CSE, EEE
+  */
+  // validation | check if created Academic faculty exist inside AcademicDepartment model || there must be a realtion between academicFaculty and AcademicDepartment
+  // Check if the department belongs to the faculty
+
+  const isDepartmentBelongToFaculty = await AcademicDepartment.findOne({
+    _id:academicDepartment, // check academicDepartment matches with payload id
+    academicFaculty,
+  }); // matching both model id
+
+  if (!isDepartmentBelongToFaculty) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `This ${isAcademicDepartmentExists.name} is not belong to this ${isAcademicFacultyExists.name}`,
+    );
+  }
+
+  // check if the same offered course same section is in same regestered semester exists
+  const isSameOfferedCourseExistsWithSameRegisteredSemesterWithSameSection =
+    await OfferedCourse.findOne({
+      semesterRegistration,
+      course,
+      section,
+    });
+
+  if (isSameOfferedCourseExistsWithSameRegisteredSemesterWithSameSection) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Offered course with same section is already exist!`,
+    );
+  }
   const result = await OfferedCourse.create({ ...payload, academicSemester }); // need to pass retrived academicSemester inside {}
   return result;
 };
