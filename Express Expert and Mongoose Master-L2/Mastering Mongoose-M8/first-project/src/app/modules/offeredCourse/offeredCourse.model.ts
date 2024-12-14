@@ -14,7 +14,7 @@ const offeredCourseSchema = new mongoose.Schema<TOfferedCourse>(
     academicSemester: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: 'AcademicSemester',
+      ref: 'AcademicSemester', // academic semester is present in semester registration model so we will not send it from frontEnd || we are keeping it in schema bz later we might need to do some query operation 
     },
     academicFaculty: {
       type: Schema.Types.ObjectId,
@@ -44,7 +44,7 @@ const offeredCourseSchema = new mongoose.Schema<TOfferedCourse>(
       type: Number,
       required: true,
     },
-    days: [
+    days: [ // in send request it is passed as array so we need to give inside ARRAY
       {
         type: String,
         enum: Days,
