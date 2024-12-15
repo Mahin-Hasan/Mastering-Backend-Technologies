@@ -16,3 +16,10 @@ export type TOfferedCourse = {
   startTime: string;
   endTime: string;
 };
+
+//for checking conflict
+export type TSchedule = {
+  days: TDays[];
+  startTime: string;
+  endTime: string;
+};
