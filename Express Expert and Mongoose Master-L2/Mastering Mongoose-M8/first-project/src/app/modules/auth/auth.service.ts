@@ -3,7 +3,8 @@ import httpStatus from 'http-status';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 import AppError from '../../errors/AppError';
-import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import config from '../../config';
 
 // using reusable custom static
 const loginUser = async (payload: TLoginUser) => {
@@ -32,12 +33,23 @@ const loginUser = async (payload: TLoginUser) => {
   }
 
   //checking if the password is correct
-  if (!(await User.isPasswordMatched(payload?.password, user?.password))){
+  if (!(await User.isPasswordMatched(payload?.password, user?.password))) {
     throw new AppError(httpStatus.FORBIDDEN, 'Password does not match !');
-
   }
-    //Access Granted: Send AccessToken, RefreshToken
-    return {};
+  //Access Granted: Send AccessToken, RefreshToken
+  const jwtPayload = {
+    userId: user, // taking from user as it is previously check as valid user
+    role: user?.role,
+  };
+  //genereate token using node cmd:  require('crypto').randomBytes(32).toString('hex')
+  const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
+    // as string to resolve undefine error
+    expiresIn: '10d',
+  });
+  return {
+    accessToken,
+    needsPasswordChange: user?.needsPasswordChange, // sending needsPasswordChange to let user know that password needs to be changed
+  };
 };
 
 export const AuthServices = {
