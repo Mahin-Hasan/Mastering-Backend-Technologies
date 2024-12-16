@@ -17,6 +17,8 @@ const getSingleFaculty = catchAsync(async (req, res) => {
 });
 
 const getAllFaculties = catchAsync(async (req, res) => {
+  console.log('test', req.user); // must declare in index.d.ts
+
   const result = await FacultyServices.getAllFacultiesFromDB(req.query);
 
   sendResponse(res, {

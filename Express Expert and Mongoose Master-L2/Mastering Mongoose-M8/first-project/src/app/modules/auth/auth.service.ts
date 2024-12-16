@@ -13,6 +13,7 @@ const loginUser = async (payload: TLoginUser) => {
 
   //check if the user isExist
   const user = await User.isUserExistsByCustomId(payload.id);
+  console.log(user);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
@@ -38,7 +39,7 @@ const loginUser = async (payload: TLoginUser) => {
   }
   //Access Granted: Send AccessToken, RefreshToken
   const jwtPayload = {
-    userId: user, // taking from user as it is previously check as valid user
+    userId: user.id, // taking from user as it is previously check as valid user
     role: user?.role,
   };
   //genereate token using node cmd:  require('crypto').randomBytes(32).toString('hex')
@@ -52,8 +53,11 @@ const loginUser = async (payload: TLoginUser) => {
   };
 };
 
+const changePassword = () => {};
+
 export const AuthServices = {
   loginUser,
+  changePassword,
 };
 
 //without using static that is declared in User model

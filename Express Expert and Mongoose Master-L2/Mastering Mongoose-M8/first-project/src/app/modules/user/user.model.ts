@@ -6,7 +6,11 @@ import bcrypt from 'bcrypt';
 const userSchema = new Schema<TUser, UserModel>( // adding UserModel for validation
   {
     id: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: {
+      type: String,
+      required: true,
+      select: 0, // ensure password does not show in response | $$$$ NOTE: it will give error as it will fail to find password for other operation in the application
+    },
     needsPasswordChange: { type: Boolean, default: true },
     role: {
       type: String,
@@ -42,7 +46,7 @@ userSchema.post('save', function (doc, next) {
 
 //creating statics to check User id isExist
 userSchema.statics.isUserExistsByCustomId = async function (id: string) {
-  return await User.findOne({ id }); // as key and value same to it can be written in short
+  return await User.findOne({ id }).select('+password'); // as key and value same to it can be written in short || $$$ NOTE: must use select or applicaiton will fail to match password | if + not added then needsPasswordChange will not show
 };
 //check password match using statics
 userSchema.statics.isPasswordMatched = async function (

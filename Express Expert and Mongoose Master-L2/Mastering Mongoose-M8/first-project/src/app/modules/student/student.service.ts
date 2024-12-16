@@ -126,6 +126,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   const studentQuery = new QueryBuilder(
     Student.find()
+      .populate('user') // if we populate get route using user then api will send full user data which includes password | we need to secure it
       .populate('admissionSemester')
       .populate({
         path: 'academicDepartment',

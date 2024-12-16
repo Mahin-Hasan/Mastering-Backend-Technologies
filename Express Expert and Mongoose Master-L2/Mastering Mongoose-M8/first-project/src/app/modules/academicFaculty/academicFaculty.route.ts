@@ -2,6 +2,7 @@ import express from 'express';
 import validateRequest from '../../middlewares/validateRequest';
 import { AcademicFacultyValidations } from './academicFaculty.validation';
 import { AcademicFacultyControllers } from './academicFaculty.controller';
+import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ router.post(
   AcademicFacultyControllers.createAcademicFaculty,
 );
 
-router.get('/', AcademicFacultyControllers.getAllAcademicFaculties);
+router.get('/',auth(), AcademicFacultyControllers.getAllAcademicFaculties);
 
 router.get('/:facultyId', AcademicFacultyControllers.getSingleAcademicFaculty);
 

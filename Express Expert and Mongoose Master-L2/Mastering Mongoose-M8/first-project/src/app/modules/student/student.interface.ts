@@ -28,7 +28,7 @@ export type TLocalGuardian = {
 export type TStudent = {
   id: string;
   user: Types.ObjectId;
-  password: string;
+  password: string; //SecurePassword hashed pass
   name: TUserName;
   gender: 'male' | 'female' | 'other';
   dateOfBirth?: Date;
@@ -42,8 +42,8 @@ export type TStudent = {
   localGuardian: TLocalGuardian;
   profileImg?: string;
   // isActive: 'active' | 'blocked';
-  admissionSemester:Types.ObjectId;// ObjectId Ref for academic semester
-  academicDepartment:Types.ObjectId;// ObjectId Ref for academic Department
+  admissionSemester: Types.ObjectId; // ObjectId Ref for academic semester
+  academicDepartment: Types.ObjectId; // ObjectId Ref for academic Department
   isDeleted: boolean;
 };
 
