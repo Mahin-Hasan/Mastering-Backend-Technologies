@@ -12,6 +12,7 @@ const userSchema = new Schema<TUser, UserModel>( // adding UserModel for validat
       select: 0, // ensure password does not show in response | $$$$ NOTE: it will give error as it will fail to find password for other operation in the application
     },
     needsPasswordChange: { type: Boolean, default: true },
+    passwordChangedAt: { type: Date }, // to keep password change time
     role: {
       type: String,
       enum: ['admin', 'student', 'faculty'],

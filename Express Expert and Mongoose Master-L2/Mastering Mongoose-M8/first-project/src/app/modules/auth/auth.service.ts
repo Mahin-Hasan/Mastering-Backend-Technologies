@@ -3,8 +3,9 @@ import httpStatus from 'http-status';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 import AppError from '../../errors/AppError';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
+import bcrypt from 'bcrypt';
 
 // using reusable custom static
 const loginUser = async (payload: TLoginUser) => {
@@ -53,7 +54,61 @@ const loginUser = async (payload: TLoginUser) => {
   };
 };
 
-const changePassword = () => {};
+// const changePassword = async(user: { userId: string; role: string }, payload) => {
+const changePassword = async (
+  userData: JwtPayload,
+  payload: { oldPassword: string; newPassword: string },
+) => {
+  //check if the user isExist
+  // const user = await User.isUserExistsByCustomId(userData.id);
+  const user = await User.isUserExistsByCustomId(userData.userId);
+  // console.log(user);
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
+  }
+  //check if the user is already deleted | isDeleted: true
+
+  const isDeleted = user?.isDeleted;
+
+  if (isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
+  }
+
+  // checking if the user is blocked
+
+  const userStatus = user?.status;
+
+  if (userStatus === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
+  }
+
+  //compare and check if old password matches
+
+  //checking if the password is correct
+  if (!(await User.isPasswordMatched(payload?.oldPassword, user?.password))) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Password does not match !');
+  }
+
+  //hash new password
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  await User.findOneAndUpdate(
+    // must use findOneAndUpdate or will give error
+    {
+      id: userData.userId,
+      role: userData.role,
+    },
+    {
+      password: newHashedPassword,
+      needsPasswordChange: false,
+      passwordChangedAt: new Date(),// add a field in model to get specific password update time
+    },
+  );
+  return null; // null bz we are updating a password field
+};
 
 export const AuthServices = {
   loginUser,

@@ -16,10 +16,9 @@ const loginUser = catchAsync(async (req, res) => {
 
 const changePassword = catchAsync(async (req, res) => {
   console.log(req.user, req.body); // from decoded user in auth.ts | output: undefined { oldPassword: 'student123', newPassword: 'student12345' } NOTE: undefined bz nothing given in route
-  const user = req.user;
   const { ...passwordData } = req.body;
-  const result = await AuthServices.changePassword(user, passwordData);
-  sendResponse(res, {
+  const result = await AuthServices.changePassword(req.user, passwordData);
+  sendResponse(res, {       
     statusCode: httpStatus.OK,
     success: true,
     message: 'Password is updated succesfully!',
