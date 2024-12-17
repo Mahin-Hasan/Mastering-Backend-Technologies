@@ -59,7 +59,7 @@ userSchema.statics.isPasswordMatched = async function (
 
 //static to check if password is changed than previously created token will not work
 //L2
-userSchema.statics.isJWTIssuedBeforePasswordChange = function (
+userSchema.statics.isJWTIssuedBeforePasswordChange = function ( 
   passwordChangedTimestamp: Date,
   jwtIssuedTimestamp: number,
 ) {

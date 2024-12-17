@@ -6,6 +6,7 @@ import AppError from '../../errors/AppError';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import bcrypt from 'bcrypt';
+import { createToken } from './auth.utils';
 
 // using reusable custom static
 const loginUser = async (payload: TLoginUser) => {
@@ -14,7 +15,7 @@ const loginUser = async (payload: TLoginUser) => {
 
   //check if the user isExist
   const user = await User.isUserExistsByCustomId(payload.id);
-  console.log(user);
+  // console.log(user);
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
   }
@@ -40,16 +41,30 @@ const loginUser = async (payload: TLoginUser) => {
   }
   //Access Granted: Send AccessToken, RefreshToken
   const jwtPayload = {
-    userId: user.id, // taking from user as it is previously check as valid user
+    userId: user.id, // taking from user as it is previously check as valid uscreateTokener
     role: user?.role,
   };
-  //genereate token using node cmd:  require('crypto').randomBytes(32).toString('hex')
-  const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
-    // as string to resolve undefine error
-    expiresIn: '10d',
-  });
+  //genereate token using node cmd:  require('crypto').randomBytes(32).toString('hex') | without create token
+  // const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {
+  //   // as string to resolve undefine error
+  //   expiresIn: '10d',
+  // });
+  //with createToken
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+
+  //if acessToken is expired we can get a new token using refreshToken
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as string,
+  );
   return {
     accessToken,
+    refreshToken,
     needsPasswordChange: user?.needsPasswordChange, // sending needsPasswordChange to let user know that password needs to be changed
   };
 };
@@ -104,15 +119,68 @@ const changePassword = async (
     {
       password: newHashedPassword,
       needsPasswordChange: false,
-      passwordChangedAt: new Date(),// add a field in model to get specific password update time
+      passwordChangedAt: new Date(), // add a field in model to get specific password update time
     },
   );
   return null; // null bz we are updating a password field
 };
 
+// refresh token
+const refreshToken = async (token: string) => {
+  // checking if the given token is valid
+  const decoded = jwt.verify(
+    token,
+    config.jwt_refresh_secret as string,
+  ) as JwtPayload;
+
+  const { userId, iat } = decoded;
+
+  // checking if the user is exist
+  const user = await User.isUserExistsByCustomId(userId);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
+  }
+  // checking if the user is already deleted
+  const isDeleted = user?.isDeleted;
+
+  if (isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
+  }
+
+  // checking if the user is blocked
+  const userStatus = user?.status;
+
+  if (userStatus === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
+  }
+
+  if (
+    user.passwordChangedAt &&
+    User.isJWTIssuedBeforePasswordChanged(user.passwordChangedAt, iat as number)
+  ) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized !');
+  }
+
+  const jwtPayload = {
+    userId: user.id,
+    role: user.role,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+
+  return {
+    accessToken,
+  };
+};
 export const AuthServices = {
   loginUser,
   changePassword,
+  refreshToken
 };
 
 //without using static that is declared in User model

@@ -9,6 +9,7 @@ const validateRequest = (schema: AnyZodObject) => {
     //try catch if error occurs
     await schema.parseAsync({
       body: req.body,
+      cookies: req.cookies, // must add cookies
     });
 
     next(); /// pass to controller or next middleware

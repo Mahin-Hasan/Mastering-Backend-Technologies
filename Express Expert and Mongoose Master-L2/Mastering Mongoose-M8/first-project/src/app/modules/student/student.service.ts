@@ -292,7 +292,7 @@ const updateStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
       modifiedUpdateData[`localGuardian.${key}`] = value;
     }
   }
-  console.log(modifiedUpdateData);
+  // console.log(modifiedUpdateData);
   // Update the student data without mutable check
   // const updatedStudent = await Student.findOneAndUpdate(
   //   { id },

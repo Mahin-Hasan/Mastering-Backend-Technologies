@@ -17,7 +17,8 @@ const getSingleFaculty = catchAsync(async (req, res) => {
 });
 
 const getAllFaculties = catchAsync(async (req, res) => {
-  console.log('test', req.user); // must declare in index.d.ts
+  console.log('test', req.user); // must declare in index.d.ts |output: test { userId: 'A-0001', role: 'admin', iat: 1734384934, exp: 1735248934 }
+  console.log('cookie:', req.cookies);// need to use cookie parser in app.ts or else it will give undefined 
 
   const result = await FacultyServices.getAllFacultiesFromDB(req.query);
 

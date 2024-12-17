@@ -71,7 +71,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     // functionality: if password is changed than previously created token will not work
     if (
       user.passwordChangedAt &&
-      User.isJWTIssuedBeforePasswordChange(
+      User.isJWTIssuedBeforePasswordChanged(
         user.passwordChangedAt,
         iat as number,
       )

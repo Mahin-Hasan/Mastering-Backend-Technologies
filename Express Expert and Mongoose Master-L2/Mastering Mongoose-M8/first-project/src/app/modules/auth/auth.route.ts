@@ -8,7 +8,7 @@ import auth from '../../middlewares/auth';
 const router = express.Router();
 
 router.post(
-  '/login',
+  '/login', //auth guard should not be used in login route bz we will not have access token before login BE CAREFUL##
   validateRequest(AuthValidation.loginValidationSchema),
   AuthControllers.loginUser,
 );
@@ -18,6 +18,12 @@ router.post(
   auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student), // every user of the app can change the password
   validateRequest(AuthValidation.changePasswordValidationSchema),
   AuthControllers.changePassword,
+);
+
+router.post(
+  '/refresh-token',//auth guard should not be used in refresh token route bz refresh token route will create access token
+  validateRequest(AuthValidation.refreshTokenValidationSchema),
+  AuthControllers.refreshToken,
 );
 
 export const AuthRoutes = router;
