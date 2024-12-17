@@ -57,4 +57,19 @@ userSchema.statics.isPasswordMatched = async function (
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
+//static to check if password is changed than previously created token will not work
+//L2
+userSchema.statics.isJWTIssuedBeforePasswordChange = function (
+  passwordChangedTimestamp: Date,
+  jwtIssuedTimestamp: number,
+) {
+  // console.log(passwordChangedTimestamp, jwtIssuedTimestamp); // 2024-12-17T20:56:31.777Z |||| 1734468199
+  // so need to convert to JWT iat format to perform check
+  const passwordChangedTime =
+    new Date(passwordChangedTimestamp).getTime() / 1000; //do not import Date
+  // console.log(passwordChangedTime, jwtIssuedTimestamp); 1734468991.777 1734468199
+  // console.log(passwordChangedTime > jwtIssuedTimestamp); true
+  return passwordChangedTime > jwtIssuedTimestamp; // functionality in auth.ts
+};
+
 export const User = model<TUser, UserModel>('User', userSchema); //adding UserModel for validation
