@@ -7,6 +7,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import bcrypt from 'bcrypt';
 import { createToken } from './auth.utils';
+import { sendEmail } from '../../utils/sendEmail';
 
 // using reusable custom static
 const loginUser = async (payload: TLoginUser) => {
@@ -177,10 +178,52 @@ const refreshToken = async (token: string) => {
     accessToken,
   };
 };
+
+const forgetPassword = async (userId: string) => {
+  console.log('from forget pass:',userId);
+  // checking if the user is exist
+  const user = await User.isUserExistsByCustomId(userId);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
+  }
+  // checking if the user is already deleted
+  const isDeleted = user?.isDeleted;
+
+  if (isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
+  }
+
+  // checking if the user is blocked
+  const userStatus = user?.status;
+
+  if (userStatus === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
+  }
+
+  //craeting new token for reseting password
+  const jwtPayload = {
+    userId: user.id,
+    role: user.role,
+  };
+
+  const resetToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    '10m', // user should complete reset within 10 minutes or else the token will expire
+  );
+  const resultUILink = `${config.reset_pass_ui_link}?id=${user.id}&token=${resetToken}`; // using this structure bz when deployed we can change the ui link
+  //resultUILink will not be sent as response it will be sent in the provided email of user i.e student |faculty | admin || need to modify user interface as email is not present
+
+  sendEmail(user.email,resultUILink) // as to and html
+  console.log(user);
+  console.log(user.email,resultUILink);
+};
 export const AuthServices = {
   loginUser,
   changePassword,
-  refreshToken
+  refreshToken,
+  forgetPassword,
 };
 
 //without using static that is declared in User model

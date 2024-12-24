@@ -20,7 +20,7 @@ router.get(
   CourseControllers.getSingleCourse,
 );
 
-router.delete('/:id', CourseControllers.deleteCourse);
+router.delete('/:id', auth('admin'), CourseControllers.deleteCourse);
 router.patch(
   '/:id',
   auth('admin'),

@@ -77,6 +77,8 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
 
   //set student role
   userData.role = 'student';
+  //set student email to user collection
+  userData.email = payload.email;
 
   //Function to generate student Id automatically
 
@@ -137,7 +139,8 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
 
   //set role as faculty
   userData.role = 'faculty';
-
+  //set faculty email to user collection
+  userData.email = payload.email;
   // find academic department info
   const academicDepartment = await AcademicDepartment.findById(
     payload.academicDepartment,
@@ -193,6 +196,8 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
 
   //set role as admin
   userData.role = 'admin';
+  //set admin email to user collection
+  userData.email = payload.email;
 
   const session = await mongoose.startSession();
 
