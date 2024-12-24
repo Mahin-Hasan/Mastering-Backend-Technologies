@@ -180,7 +180,6 @@ const refreshToken = async (token: string) => {
 };
 
 const forgetPassword = async (userId: string) => {
-  console.log('from forget pass:',userId);
   // checking if the user is exist
   const user = await User.isUserExistsByCustomId(userId);
 
@@ -215,15 +214,71 @@ const forgetPassword = async (userId: string) => {
   const resultUILink = `${config.reset_pass_ui_link}?id=${user.id}&token=${resetToken}`; // using this structure bz when deployed we can change the ui link
   //resultUILink will not be sent as response it will be sent in the provided email of user i.e student |faculty | admin || need to modify user interface as email is not present
 
-  sendEmail(user.email,resultUILink) // as to and html
+  sendEmail(user.email, resultUILink); // as to and html
   console.log(user);
-  console.log(user.email,resultUILink);
+  console.log(user.email, resultUILink);
 };
+
+const resetPassword = async (
+  payload: { id: string; newPassword: string },
+  token: string,
+) => {
+  // checking if the user is exist
+  const user = await User.isUserExistsByCustomId(payload.id);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
+  }
+  // checking if the user is already deleted
+  const isDeleted = user?.isDeleted;
+
+  if (isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
+  }
+
+  // checking if the user is blocked
+  const userStatus = user?.status;
+
+  if (userStatus === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
+  }
+  // validate user id get from token and payload id same or not. to ensure no user can reset password with another users email token
+  //as reset token is created using assess_secret so it should be checked using assess_secret
+  const decoded = jwt.verify(
+    token,
+    config.jwt_access_secret as string,
+  ) as JwtPayload;
+
+  console.log(decoded); // { userId: 'A-0002', role: 'admin', iat: 1735080779, exp: 1735081379 } // note:1 log admin-token > forget passtoken > give forget pass token in reset token header withing 10m or else it will not work
+  if (payload.id !== decoded.userId) {
+    throw new AppError(httpStatus.FORBIDDEN, 'You are forbidden ! !');
+  }
+  ////hash new password
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  await User.findOneAndUpdate(
+    // must use findOneAndUpdate or will give error
+    {
+      id: decoded.userId,
+      role: decoded.role,
+    },
+    {
+      password: newHashedPassword,
+      needsPasswordChange: false,
+      passwordChangedAt: new Date(), // add a field in model to get specific password update time
+    },
+  );
+};
+
 export const AuthServices = {
   loginUser,
   changePassword,
   refreshToken,
   forgetPassword,
+  resetPassword,
 };
 
 //without using static that is declared in User model
