@@ -6,7 +6,7 @@ import AppError from '../../errors/AppError';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import bcrypt from 'bcrypt';
-import { createToken } from './auth.utils';
+import { createToken, verifyToken } from './auth.utils';
 import { sendEmail } from '../../utils/sendEmail';
 
 // using reusable custom static
@@ -129,10 +129,7 @@ const changePassword = async (
 // refresh token
 const refreshToken = async (token: string) => {
   // checking if the given token is valid
-  const decoded = jwt.verify(
-    token,
-    config.jwt_refresh_secret as string,
-  ) as JwtPayload;
+  const decoded = verifyToken(token, config.jwt_refresh_secret as string); // as it is refresh secret so we have to use refresh_secret
 
   const { userId, iat } = decoded;
 
@@ -244,10 +241,7 @@ const resetPassword = async (
   }
   // validate user id get from token and payload id same or not. to ensure no user can reset password with another users email token
   //as reset token is created using assess_secret so it should be checked using assess_secret
-  const decoded = jwt.verify(
-    token,
-    config.jwt_access_secret as string,
-  ) as JwtPayload;
+  const decoded = verifyToken(token, config.jwt_access_secret as string);
 
   console.log(decoded); // { userId: 'A-0002', role: 'admin', iat: 1735080779, exp: 1735081379 } // note:1 log admin-token > forget passtoken > give forget pass token in reset token header withing 10m or else it will not work
   if (payload.id !== decoded.userId) {

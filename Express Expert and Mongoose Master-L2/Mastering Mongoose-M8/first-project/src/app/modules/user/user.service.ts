@@ -18,6 +18,7 @@ import { AcademicDepartment } from '../academicDepartment/academicDepartment.mod
 import { TFaculty } from '../faculty/faculty.interface';
 import { TAdmin } from '../admin/admin.interface';
 import { Admin } from '../admin/admin.model';
+import { verifyToken } from '../auth/auth.utils';
 
 /* without transition and rollback
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
@@ -79,7 +80,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   userData.role = 'student';
   //set student email to user collection
   userData.email = payload.email;
-  
+
   //Function to generate student Id automatically
 
   //find academic semester info that is stored in ref in student model but created using User model
@@ -87,9 +88,9 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     payload.admissionSemester,
   );
 
-  //solving null error 
+  //solving null error
   if (!admissionSemester) {
-    throw new Error( 
+    throw new Error(
       `Academic semester with ID ${payload.admissionSemester} not found`,
     );
   }
@@ -124,11 +125,10 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     await session.endSession(); // ending session
 
     return newStudent;
-  } catch (err:any) {
+  } catch (err: any) {
     await session.abortTransaction(); // in case error encounter then the session will rollback
     await session.endSession(); // ending session
     throw new Error(err);
-
   }
 };
 
@@ -238,8 +238,30 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   }
 };
 
+const getMe = async (token: string) => {
+  const decoded = verifyToken(token, config.jwt_access_secret as string); // this verify token util func is decalred in auth.util.ts
+  const { userId, role } = decoded;
+
+  console.log('getMe', userId, role); //getMe 2030010005 student | after hitting get me route with student token | ie jar token tar id and role dibe
+
+  let result = null;
+  if (role === 'student') {
+    result = await Student.findOne({ id: userId }).populate('user'); // findOne bz custom id
+  }
+  if (role === 'admin') {
+    result = await Admin.findOne({ id: userId }).populate('user');
+  }
+
+  if (role === 'faculty') {
+    result = await Faculty.findOne({ id: userId }).populate('user');
+  }
+
+  return result;
+};
+
 export const UserServices = {
   createStudentIntoDB,
   createFacultyIntoDB,
   createAdminIntoDB,
+  getMe,
 };

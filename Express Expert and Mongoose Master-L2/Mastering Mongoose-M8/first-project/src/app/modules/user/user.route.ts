@@ -28,6 +28,10 @@ router.post(
   UserControllers.createAdmin,
 );
 
+// this route is creted to ensure proper security in get single student when this route is hit by student token, as a logged student can only view his her details but for admin and faculty they have full access to all students records
+router.get('/me', auth('student', 'faculty', 'admin'), UserControllers.getMe);
+
+
 export const UserRoutes = router;
 
 //whitout HOF - higher order function
