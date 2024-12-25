@@ -19,6 +19,7 @@ import { TFaculty } from '../faculty/faculty.interface';
 import { TAdmin } from '../admin/admin.interface';
 import { Admin } from '../admin/admin.model';
 import { verifyToken } from '../auth/auth.utils';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 /* without transition and rollback
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
@@ -70,7 +71,11 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
 
 //in this create user we are writing 2 collection as the same time while creating user I.e User colleciton and student collection || we need to implement transition and rollback for smooth operation so that in database no inconsistancy do not appear || Transition and rollback follows ACID method read docs
 //with transition and rollback
-const createStudentIntoDB = async (password: string, payload: TStudent) => {
+const createStudentIntoDB = async (
+  file: any,
+  password: string,
+  payload: TStudent,
+) => {
   //create a user object
   const userData: Partial<TUser> = {};
 
@@ -101,6 +106,13 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     session.startTransaction();
     // userData.id = '2030100001';
     userData.id = await generateStudentId(admissionSemester);
+
+    //generate a custom image id as per user name
+    const imageName = `${userData.id}${payload?.name?.firstName}`; //ie customid and user name will be image name
+    const path = file.path;
+    //Calling cloudinary for storing image
+    const profileImg = await sendImageToCloudinary(imageName, path);
+    const { secure_url } = profileImg;
     //create a user (Transaction-1)
     const newUser = await User.create([userData], { session }); // must pass inside array || prev it newUser was Obj now it is Array
 
@@ -112,6 +124,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     //obj.keys makes result as array and thus lenghth property can be used
     payload.id = newUser[0].id; //embedding generated Id
     payload.user = newUser[0]._id; //referencing user _id to student.User
+    payload.profileImg = secure_url; //referencing user _id to student.User
 
     //create a student (Transaction-2)
 
@@ -238,11 +251,11 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
   }
 };
 
-const getMe = async (token: string) => {
-  const decoded = verifyToken(token, config.jwt_access_secret as string); // this verify token util func is decalred in auth.util.ts
-  const { userId, role } = decoded;
+const getMe = async (userId: string, role: string) => {
+  // const decoded = verifyToken(token, config.jwt_access_secret as string); // this verify token util func is decalred in auth.util.ts
+  // const { userId, role } = decoded;
 
-  console.log('getMe', userId, role); //getMe 2030010005 student | after hitting get me route with student token | ie jar token tar id and role dibe
+  // console.log('getMe', userId, role); //getMe 2030010005 student | after hitting get me route with student token | ie jar token tar id and role dibe
 
   let result = null;
   if (role === 'student') {
@@ -259,9 +272,16 @@ const getMe = async (token: string) => {
   return result;
 };
 
+const changeStatus = async (id: string, payload: { status: string }) => {
+  const result = await User.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return result;
+};
 export const UserServices = {
   createStudentIntoDB,
   createFacultyIntoDB,
   createAdminIntoDB,
   getMe,
+  changeStatus,
 };

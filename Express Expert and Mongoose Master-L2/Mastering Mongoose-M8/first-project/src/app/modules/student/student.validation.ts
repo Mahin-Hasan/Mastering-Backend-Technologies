@@ -160,7 +160,7 @@ const createStudentValidatoinSchemaZod = z.object({
     // id: z.string().min(1, { message: 'Student ID is required' }),
     password: z
       .string()
-      .max(20, { message: 'Password can not be more than 20 characters' }),
+      .max(20, { message: 'Password can not be more than 20 characters' }).optional(), // optional bz we have set default password
     student: z.object({
       name: createUserNameValidationSchema,
       gender: z.enum(['male', 'female', 'other'], {
