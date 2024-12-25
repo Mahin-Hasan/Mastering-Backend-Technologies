@@ -4,6 +4,7 @@ import express from 'express';
 import { StudentControllers } from './student.controller';
 import validateRequest from '../../middlewares/validateRequest';
 import { studentValidatoins } from './student.validation';
+import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
@@ -18,7 +19,11 @@ const router = express.Router();
 
 // routes for mongodb generated ID
 router.get('/', StudentControllers.getAllStudents);
-router.get('/:id', StudentControllers.getSingleStudent);
+router.get(
+  '/:id',
+  auth('student', 'admin', 'faculty'), // for student it will work only if logged user token id matches with collection id || i.e me route || akjon student onnojon er data access korte parbe nah
+  StudentControllers.getSingleStudent,
+);
 router.delete('/:id', StudentControllers.deleteStudent);
 router.patch(
   '/:id',

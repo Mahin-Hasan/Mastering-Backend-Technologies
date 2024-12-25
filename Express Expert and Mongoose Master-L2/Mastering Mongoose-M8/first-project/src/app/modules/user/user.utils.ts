@@ -54,6 +54,7 @@ const findLastStudentId = async () => {
 };
 
 //format year semestercode 4 digit number
+//my generate id code
 export const generateStudentId = async (payload: TAcademicSemester) => {
   //   console.log(await findLastStudentId());
   //first time 0000

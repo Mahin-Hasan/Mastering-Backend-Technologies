@@ -79,7 +79,7 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   userData.role = 'student';
   //set student email to user collection
   userData.email = payload.email;
-
+  
   //Function to generate student Id automatically
 
   //find academic semester info that is stored in ref in student model but created using User model
@@ -87,9 +87,9 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     payload.admissionSemester,
   );
 
-  //solving null error
+  //solving null error 
   if (!admissionSemester) {
-    throw new Error(
+    throw new Error( 
       `Academic semester with ID ${payload.admissionSemester} not found`,
     );
   }
@@ -122,13 +122,16 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
     //if code comes to this line it means our transection is successful
     await session.commitTransaction(); // save Transaction parmanently
     await session.endSession(); // ending session
+
     return newStudent;
-  } catch (err) {
+  } catch (err:any) {
     await session.abortTransaction(); // in case error encounter then the session will rollback
     await session.endSession(); // ending session
-    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Student'); // must throw error or else api will not give proper response
+    throw new Error(err);
+
   }
 };
+
 //create faculty
 const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   // create a user object

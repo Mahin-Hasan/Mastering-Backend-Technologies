@@ -60,7 +60,7 @@ userSchema.statics.isPasswordMatched = async function (
 
 //static to check if password is changed than previously created token will not work
 //L2
-userSchema.statics.isJWTIssuedBeforePasswordChange = function ( 
+userSchema.statics.isJWTIssuedBeforePasswordChanged = function ( 
   passwordChangedTimestamp: Date,
   jwtIssuedTimestamp: number,
 ) {
@@ -72,5 +72,6 @@ userSchema.statics.isJWTIssuedBeforePasswordChange = function (
   // console.log(passwordChangedTime > jwtIssuedTimestamp); true
   return passwordChangedTime > jwtIssuedTimestamp; // functionality in auth.ts
 };
+
 
 export const User = model<TUser, UserModel>('User', userSchema); //adding UserModel for validation

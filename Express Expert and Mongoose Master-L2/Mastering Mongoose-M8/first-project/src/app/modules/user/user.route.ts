@@ -11,17 +11,19 @@ const router = express.Router();
 
 router.post(
   '/create-student',
-  auth(USER_ROLE.admin), //must be admin in order to create student USER_ROLE.admin|  as auth() is added ensure to add send token to create student Header
+ auth(USER_ROLE.admin), //must be admin in order to create student USER_ROLE.admin|  as auth() is added ensure to add send token to create student Header
   validateRequest(studentValidatoins.createStudentValidatoinSchemaZod),
   UserControllers.createStudent,
 );
 router.post(
   '/create-faculty',
+  auth(USER_ROLE.admin),
   validateRequest(facultyValidations.createFacultyValidationSchema),
   UserControllers.createFaculty,
 );
 router.post(
   '/create-admin',
+  // auth(USER_ROLE.admin), | turn on when we will have a super admin
   validateRequest(AdminValidations.createAdminValidationSchema),
   UserControllers.createAdmin,
 );
