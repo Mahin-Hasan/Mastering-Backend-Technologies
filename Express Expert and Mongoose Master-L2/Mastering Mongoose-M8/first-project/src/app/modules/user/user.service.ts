@@ -111,7 +111,7 @@ const createStudentIntoDB = async (
     const imageName = `${userData.id}${payload?.name?.firstName}`; //ie customid and user name will be image name
     const path = file.path;
     //Calling cloudinary for storing image
-    const profileImg = await sendImageToCloudinary(imageName, path);
+    const profileImg = await sendImageToCloudinary(imageName, path) as { secure_url: string };;
     const { secure_url } = profileImg;
     //create a user (Transaction-1)
     const newUser = await User.create([userData], { session }); // must pass inside array || prev it newUser was Obj now it is Array
@@ -124,7 +124,7 @@ const createStudentIntoDB = async (
     //obj.keys makes result as array and thus lenghth property can be used
     payload.id = newUser[0].id; //embedding generated Id
     payload.user = newUser[0]._id; //referencing user _id to student.User
-    payload.profileImg = secure_url; //referencing user _id to student.User
+    payload.profileImg = secure_url ; //referencing user _id to student.User
 
     //create a student (Transaction-2)
 
