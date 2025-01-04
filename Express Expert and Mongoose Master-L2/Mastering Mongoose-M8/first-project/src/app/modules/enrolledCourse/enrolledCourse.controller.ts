@@ -2,7 +2,7 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 //@ts-ignore
 import httpStatus from 'http-status';
-import { EnrolledCourseService } from './enrolledCourse.service';
+import { EnrolledCourseServices } from './enrolledCourse.service';
 
 const createEnrolledCourse = catchAsync(async (req, res) => {
   // console.log(req.user, 'USER');
@@ -16,7 +16,7 @@ const createEnrolledCourse = catchAsync(async (req, res) => {
 */
   const userId = req.user.userId;
 
-  const result = await EnrolledCourseService.createEnrolledCourseIntoDB(
+  const result = await EnrolledCourseServices.createEnrolledCourseIntoDB(
     userId,
     req.body,
   );
@@ -29,6 +29,22 @@ const createEnrolledCourse = catchAsync(async (req, res) => {
   });
 });
 
+const updateEnrolledCourseMarks = catchAsync(async (req, res) => {
+  const facultyId = req.user.userId; // must login using faculty that is stored in enrolled courses. i.e course faculty can update course marks in our case faculty is F-0003
+  console.log(facultyId);
+  const result = await EnrolledCourseServices.updateEnrolledCourseMarksIntoDB(
+    facultyId,
+    req.body,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Marks is updated succesfully',
+    data: result,
+  });
+});
 export const EnrolledCourseControllers = {
   createEnrolledCourse,
+  updateEnrolledCourseMarks
 };

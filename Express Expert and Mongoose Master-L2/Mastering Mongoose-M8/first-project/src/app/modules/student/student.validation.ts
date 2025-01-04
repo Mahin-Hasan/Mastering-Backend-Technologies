@@ -190,7 +190,7 @@ const createStudentValidatoinSchemaZod = z.object({
       localGuardian: CreateLocalGuardianValidationSchema,
       admissionSemester: z.string(),
       academicDepartment: z.string(),
-      profileImg: z.string(),
+      // profileImg: z.string(), as we have embeded cloudinary so we don't need to send profile image from response
     }),
     // isActive: z.enum(['active', 'blocked']).default('active'),
     // isDeleted: z.boolean().default(false), // commenting bz it is transferred to user model
