@@ -85,7 +85,7 @@ const enrolledCourseSchema = new Schema<TEnrolledCourse>({
   },
   courseMarks: {
     type: courseMarksSchema,
-    default: {},
+    default: {}, // must provide empty obj or else it will not put default value
   },
   grade: {
     type: String,
