@@ -2,7 +2,7 @@ import { model, Schema } from 'mongoose';
 import { TUser, UserModel } from './user.interface';
 import config from '../../config';
 import bcrypt from 'bcrypt';
-import { UserStatus } from './user.constant';
+import { USER_ROLE, UserStatus } from './user.constant';
 
 const userSchema = new Schema<TUser, UserModel>( // adding UserModel for validation
   {
@@ -17,7 +17,8 @@ const userSchema = new Schema<TUser, UserModel>( // adding UserModel for validat
     passwordChangedAt: { type: Date }, // to keep password change time
     role: {
       type: String,
-      enum: ['admin', 'student', 'faculty'],
+      enum: ['super-admin', 'admin', 'student', 'faculty'],
+      // enum: Object.values(USER_ROLE),
     },
     status: {
       type: String,
@@ -61,7 +62,7 @@ userSchema.statics.isPasswordMatched = async function (
 
 //static to check if password is changed than previously created token will not work
 //L2
-userSchema.statics.isJWTIssuedBeforePasswordChanged = function ( 
+userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
   passwordChangedTimestamp: Date,
   jwtIssuedTimestamp: number,
 ) {
@@ -73,6 +74,5 @@ userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
   // console.log(passwordChangedTime > jwtIssuedTimestamp); true
   return passwordChangedTime > jwtIssuedTimestamp; // functionality in auth.ts
 };
-
 
 export const User = model<TUser, UserModel>('User', userSchema); //adding UserModel for validation

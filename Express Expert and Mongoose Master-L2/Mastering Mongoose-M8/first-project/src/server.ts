@@ -2,13 +2,17 @@ import mongoose from 'mongoose';
 import config from './app/config';
 import app from './app';
 import { Server } from 'http';
+import seedSuperAdmin from './app/DB';
 
 //handling UnhandledPromiseRejection error
 let server: Server;
 async function main() {
   try {
-    await mongoose.connect(config.databse_url as string);
+    await mongoose.connect(config.database_url as string);
     //with handling UnhandledPromiseRejection error
+
+    //seed super admin
+    seedSuperAdmin();
 
     server = app.listen(config.port, () => {
       console.log(`App is listening on port ${config.port}`);
