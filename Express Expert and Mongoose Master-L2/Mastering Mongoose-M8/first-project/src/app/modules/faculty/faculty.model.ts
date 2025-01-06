@@ -80,8 +80,13 @@ const facultySchema = new Schema<TFaculty, FacultyModel>(
     profileImg: { type: String, default: '' },
     academicDepartment: {
       type: Schema.Types.ObjectId,
-      required: [true, 'User id is required'],
+      required: [true, 'Academic Dept is required'],
       ref: 'AcademicDepartment', // must use ref or else populate will not work
+    },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'Academic Faculty is required'],
+      ref: 'AcademicFaculty', // must use ref or else populate will not work | this data is filtered from academic dept using find then after retriving we are saving it
     },
     isDeleted: {
       type: Boolean,

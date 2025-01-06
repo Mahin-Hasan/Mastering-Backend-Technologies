@@ -14,10 +14,10 @@ const router = express.Router();
 //with image upload
 router.post(
   '/create-student',
-  auth(USER_ROLE.superAdmin,USER_ROLE.admin), 
-  upload.single('file'),// as in upload we are using file to give image so we need to create a middleware that will parse image and text to json format for validate request middleware
-  (req:Request,res:Response,next:NextFunction)=>{
-    req.body = JSON.parse(req.body.data);// as passed in form data
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  upload.single('file'), // as in upload we are using file to give image so we need to create a middleware that will parse image and text to json format for validate request middleware
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data); // as passed in form data
     next(); // must call next function or else it will not got to next middleware
   },
   //must be admin in order to create student USER_ROLE.admin|  as auth() is added ensure to add send token to create student Header
@@ -33,26 +33,40 @@ router.post(
 // );
 router.post(
   '/create-faculty',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data); // as passed in form data
+    next(); // must call next function or else it will not got to next middleware
+  },
   validateRequest(facultyValidations.createFacultyValidationSchema),
   UserControllers.createFaculty,
 );
 router.post(
   '/create-admin',
-  // auth(USER_ROLE.admin), | turn on when we will have a super admin
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
+  upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data); // as passed in form data
+    next(); // must call next function or else it will not got to next middleware
+  },
   validateRequest(AdminValidations.createAdminValidationSchema),
   UserControllers.createAdmin,
 );
 //for setting user status blocked or in-progress | when blocked the studnet user cannot login
 router.post(
   '/change-status/:id',
-  auth('admin'),
+  auth(USER_ROLE.superAdmin, USER_ROLE.admin),
   validateRequest(UserValidation.changeStatusValidationSchema),
   UserControllers.changeStatus,
 );
 
 // this route is creted to ensure proper security in get single student when this route is hit by student token, as a logged student can only view his her details but for admin and faculty they have full access to all students records
-router.get('/me', auth('student', 'faculty', 'admin'), UserControllers.getMe);
+router.get(
+  '/me',
+  auth('superAdmin', 'student', 'faculty', 'admin'), // change if error
+  UserControllers.getMe,
+);
 
 export const UserRoutes = router;
 

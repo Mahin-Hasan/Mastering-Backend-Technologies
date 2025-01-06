@@ -18,15 +18,20 @@ const router = express.Router();
 // router.patch('/:studentId',validateRequest(studentValidatoins.updateStudentValidatoinSchemaZod), StudentControllers.updateStudent); // Update API
 
 // routes for mongodb generated ID
-router.get('/', StudentControllers.getAllStudents);
+router.get('/', auth('superAdmin', 'admin'), StudentControllers.getAllStudents);
 router.get(
   '/:id',
-  auth('student', 'admin', 'faculty'), // for student it will work only if logged user token id matches with collection id || i.e me route || akjon student onnojon er data access korte parbe nah
+  auth('superAdmin', 'admin', 'faculty'), // for student it will work only if logged user token id matches with collection id || i.e me route || akjon student onnojon er data access korte parbe nah
   StudentControllers.getSingleStudent,
 );
-router.delete('/:id', StudentControllers.deleteStudent);
+router.delete(
+  '/:id',
+  auth('superAdmin', 'admin'),
+  StudentControllers.deleteStudent,
+);
 router.patch(
   '/:id',
+  auth('superAdmin', 'admin'),
   validateRequest(studentValidatoins.updateStudentValidatoinSchemaZod),
   StudentControllers.updateStudent,
 ); // Update API

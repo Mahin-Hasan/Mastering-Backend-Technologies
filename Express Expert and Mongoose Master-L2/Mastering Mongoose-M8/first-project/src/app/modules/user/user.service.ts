@@ -186,7 +186,8 @@ const createFacultyIntoDB = async (
   if (!academicDepartment) {
     throw new AppError(400, 'Academic department not found');
   }
-
+  //embedding academic faculty to db
+  payload.academicFaculty = academicDepartment.academicFaculty;
   const session = await mongoose.startSession();
 
   try {
