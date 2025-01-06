@@ -160,14 +160,18 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       type: localGuardianSchema,
       required: [true, 'Local guardian details are required.'],
     },
-    profileImg: { type: String },
+    profileImg: { type: String, default: '' },
     // isActive: { // is not in user model
     //   type: String,
     //   enum: ['active', 'blocked'],
     //   default: 'active', // Default value for new entries
     // },
     admissionSemester: { type: Schema.Types.ObjectId, ref: 'AcademicSemester' },
-    academicDepartment: { type: Schema.Types.ObjectId, ref: 'AcademicDepartment' },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicDepartment',
+    },
+    academicFaculty: { type: Schema.Types.ObjectId, ref: 'AcademicFaculty' },
     isDeleted: {
       type: Boolean,
       default: false,

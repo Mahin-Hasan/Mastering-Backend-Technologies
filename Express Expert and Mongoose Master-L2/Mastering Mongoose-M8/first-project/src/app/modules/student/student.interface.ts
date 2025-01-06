@@ -44,6 +44,7 @@ export type TStudent = {
   // isActive: 'active' | 'blocked';
   admissionSemester: Types.ObjectId; // ObjectId Ref for academic semester
   academicDepartment: Types.ObjectId; // ObjectId Ref for academic Department
+  academicFaculty: Types.ObjectId; // ObjectId Ref for academic Faculty
   isDeleted: boolean;
 };
 

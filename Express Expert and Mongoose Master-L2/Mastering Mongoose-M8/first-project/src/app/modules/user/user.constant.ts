@@ -1,6 +1,6 @@
 export const USER_ROLE = {
   // used for authorization
-  superAdmin: 'super-admin',
+  superAdmin: 'superAdmin',
   admin: 'admin',
   student: 'student',
   faculty: 'faculty',

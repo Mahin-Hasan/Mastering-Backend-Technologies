@@ -100,6 +100,17 @@ const createStudentIntoDB = async (
     );
   }
 
+  // find department
+  const academicDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  );
+
+  if (!academicDepartment) {
+    throw new AppError(400, 'Aademic department not found');
+  }
+
+  payload.academicFaculty = academicDepartment.academicFaculty; // no need extra validation as we are getting data from payload | payload er moddhe notun field add koro
+
   //transaction and rollback
   const session = await mongoose.startSession();
   try {
@@ -108,11 +119,18 @@ const createStudentIntoDB = async (
     userData.id = await generateStudentId(admissionSemester);
 
     //generate a custom image id as per user name
-    const imageName = `${userData.id}${payload?.name?.firstName}`; //ie customid and user name will be image name
-    const path = file.path;
-    //Calling cloudinary for storing image
-    const profileImg = await sendImageToCloudinary(imageName, path) as { secure_url: string };;
-    const { secure_url } = profileImg;
+    //making image upload optional using if block
+    if (file) {
+      const imageName = `${userData.id}${payload?.name?.firstName}`; //ie customid and user name will be image name
+      const path = file.path;
+      //Calling cloudinary for storing image
+      const profileImg = (await sendImageToCloudinary(imageName, path)) as {
+        secure_url: string;
+      }; // unknown error can be solved using record string unknown see module 21-3
+      const { secure_url } = profileImg;
+      payload.profileImg = secure_url; //referencing user _id to student.User
+    }
+
     //create a user (Transaction-1)
     const newUser = await User.create([userData], { session }); // must pass inside array || prev it newUser was Obj now it is Array
 
@@ -124,7 +142,6 @@ const createStudentIntoDB = async (
     //obj.keys makes result as array and thus lenghth property can be used
     payload.id = newUser[0].id; //embedding generated Id
     payload.user = newUser[0]._id; //referencing user _id to student.User
-    payload.profileImg = secure_url ; //referencing user _id to student.User
 
     //create a student (Transaction-2)
 
@@ -146,7 +163,11 @@ const createStudentIntoDB = async (
 };
 
 //create faculty
-const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
+const createFacultyIntoDB = async (
+  file: any,
+  password: string,
+  payload: TFaculty,
+) => {
   // create a user object
   const userData: Partial<TUser> = {};
 
@@ -172,7 +193,16 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
     session.startTransaction();
     //set  generated id
     userData.id = await generateFacultyId();
-
+    if (file) {
+      const imageName = `${userData.id}${payload?.name?.firstName}`; //ie customid and user name will be image name
+      const path = file.path;
+      //Calling cloudinary for storing image
+      const profileImg = (await sendImageToCloudinary(imageName, path)) as {
+        secure_url: string;
+      }; // unknown error can be solved using record string unknown see module 21-3
+      const { secure_url } = profileImg;
+      payload.profileImg = secure_url; //referencing user _id to student.User
+    }
     // create a user (transaction-1)
     const newUser = await User.create([userData], { session }); // array
 
@@ -203,7 +233,11 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
   }
 };
 //create Admin
-const createAdminIntoDB = async (password: string, payload: TAdmin) => {
+const createAdminIntoDB = async (
+  file: any,
+  password: string,
+  payload: TAdmin,
+) => {
   //create a user object
   const userData: Partial<TUser> = {};
 
@@ -221,7 +255,16 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
     session.startTransaction();
     //set generated id
     userData.id = await generateAdminId();
-
+    if (file) {
+      const imageName = `${userData.id}${payload?.name?.firstName}`; //ie customid and user name will be image name
+      const path = file.path;
+      //Calling cloudinary for storing image
+      const profileImg = (await sendImageToCloudinary(imageName, path)) as {
+        secure_url: string;
+      }; // unknown error can be solved using record string unknown see module 21-3
+      const { secure_url } = profileImg;
+      payload.profileImg = secure_url; //referencing user _id to student.User
+    }
     //create a user | transaction-1
     const newUser = await User.create([userData], { session });
 

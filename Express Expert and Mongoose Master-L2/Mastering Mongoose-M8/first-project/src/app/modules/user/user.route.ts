@@ -14,7 +14,7 @@ const router = express.Router();
 //with image upload
 router.post(
   '/create-student',
-  auth(USER_ROLE.admin), 
+  auth(USER_ROLE.superAdmin,USER_ROLE.admin), 
   upload.single('file'),// as in upload we are using file to give image so we need to create a middleware that will parse image and text to json format for validate request middleware
   (req:Request,res:Response,next:NextFunction)=>{
     req.body = JSON.parse(req.body.data);// as passed in form data

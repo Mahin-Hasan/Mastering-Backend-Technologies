@@ -2,6 +2,9 @@ import config from '../config';
 import { USER_ROLE } from '../modules/user/user.constant';
 import { User } from '../modules/user/user.model';
 
+/* super admin token
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIwMDAxIiwicm9sZSI6InN1cGVyQWRtaW4iLCJpYXQiOjE3MzYxMDkwMTUsImV4cCI6MTczNjk3MzAxNX0.1TJ9FsW9H9KGLmrZWJn_s5o5Y3NeZeSoBZE-9z0VeBs
+*/
 const superUser = {
   id: '0001',
   email: 'mahinhasan3700@gmail.com',

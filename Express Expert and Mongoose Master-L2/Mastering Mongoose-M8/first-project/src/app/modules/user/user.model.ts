@@ -17,7 +17,7 @@ const userSchema = new Schema<TUser, UserModel>( // adding UserModel for validat
     passwordChangedAt: { type: Date }, // to keep password change time
     role: {
       type: String,
-      enum: ['super-admin', 'admin', 'student', 'faculty'],
+      enum: ['superAdmin', 'admin', 'student', 'faculty'],
       // enum: Object.values(USER_ROLE),
     },
     status: {
