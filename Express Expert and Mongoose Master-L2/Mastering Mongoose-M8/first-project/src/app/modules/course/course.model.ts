@@ -6,16 +6,21 @@ import {
 } from './course.interface';
 
 // basic update and array update will take place in this course model
-const preRequisiteCoursesSchema = new Schema<TPreRequisiteCourses>({
-  course: {
-    type: Schema.Types.ObjectId,
-    ref: 'Course', // ref with course model
+const preRequisiteCoursesSchema = new Schema<TPreRequisiteCourses>(
+  {
+    course: {
+      type: Schema.Types.ObjectId,
+      ref: 'Course', // ref with course model
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  isDeleted: {
-    type: Boolean,
-    default: false,
+  {
+    _id: false, // must provide this or else it will create unncessary _id
   },
-});
+);
 
 const courseSchema = new Schema<TCourse>(
   {
@@ -68,4 +73,7 @@ const courseFacultySchema = new Schema<TCourseFaculty>({
     },
   ],
 });
-export const CourseFaculty = model<TCourseFaculty>('CourseFaculty', courseFacultySchema);
+export const CourseFaculty = model<TCourseFaculty>(
+  'CourseFaculty',
+  courseFacultySchema,
+);

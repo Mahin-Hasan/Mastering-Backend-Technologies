@@ -9,37 +9,47 @@ const router = express.Router();
 
 router.post(
   '/create-course',
-  auth('admin'), // can be written as  auth(USER_ROLE.admin)
+  auth('superAdmin', 'admin'), // can be written as  auth(USER_ROLE.admin)
   validateRequest(CourseValidations.createCourseValidationSchema),
   CourseControllers.createCourse,
 );
 
 router.get(
   '/:id',
-  auth('admin', 'faculty', 'student'),
+  auth('superAdmin', 'admin', 'faculty', 'student'),
   CourseControllers.getSingleCourse,
 );
 
-router.delete('/:id', auth('admin'), CourseControllers.deleteCourse);
+router.delete(
+  '/:id',
+  auth('superAdmin', 'admin'),
+  CourseControllers.deleteCourse,
+);
 router.patch(
   '/:id',
-  auth('admin'),
+  auth('superAdmin', 'admin'),
   validateRequest(CourseValidations.updateCourseValidationSchema),
   CourseControllers.updateCourse,
 );
 //put used for specific purpose | ie. if exist than update if does not exist then create
 router.put(
   '/:courseId/assign-faculties',
+  auth('superAdmin', 'admin'),
   validateRequest(CourseValidations.facultiesWithCourseValidationSchema),
   CourseControllers.assignFacultiesWithCourse,
 );
 //remove faculties route
 router.delete(
   '/:courseId/remove-faculties',
+  auth('superAdmin', 'admin'),
   validateRequest(CourseValidations.facultiesWithCourseValidationSchema),
   CourseControllers.removeFacultiesFromCourse,
 );
 
-router.get('/', CourseControllers.getAllCourses);
+router.get(
+  '/',
+  auth('superAdmin', 'admin', 'faculty', 'student'),
+  CourseControllers.getAllCourses,
+);
 
 export const CourseRoutes = router;

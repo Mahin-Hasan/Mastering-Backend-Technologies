@@ -59,5 +59,5 @@ export const AcademicSemester = model<TAcademicSemester>(
 /*
 Functionality
 1. In same year two same semester cannot be created || setting name as unique true will not solve the issue cz next year Autumn semester will be offered once again
-2. Autum code should be 1 Fall Summar 2 Fall 3
+2. Autum code should be 1 Fall Summer 2 Fall 3
 */

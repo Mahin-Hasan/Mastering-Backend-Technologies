@@ -7,7 +7,7 @@ const createAcademicSemesterIntoDB = async (payload: TAcademicSemester) => {
   // we will not this type to declare mapped types
   //   type TAcademicSemesterNameCodeMapper = {
   //     Autumn: '01';
-  //     Summar: '02';
+  //     Summer: '02';
   //     Fall: '03';
   //   };
 
