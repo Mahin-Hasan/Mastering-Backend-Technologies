@@ -109,7 +109,7 @@ const createOfferedCourseIntoDB = async (payload: TOfferedCourse) => {
     faculty,
     days: { $in: days }, // frontend tekhe asha date
   }).select('days startTime endTime');
-  console.log(assignedSchedules);
+  // console.log(assignedSchedules);
   /* {
     _id: new ObjectId('675dedc520e8a42554b9a738'),
     days: [Array],

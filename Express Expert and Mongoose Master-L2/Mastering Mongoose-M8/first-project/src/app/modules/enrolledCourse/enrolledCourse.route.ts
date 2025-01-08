@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post(
   '/create-enrolled-course',
-  auth('student'),
+  auth('student'), // you can use other pattern used in other route model
   validateRequest(
     EnrolledCourseValidations.createEnrolledCourseValidationZodSchema,
   ),
@@ -17,7 +17,7 @@ router.post(
 
 router.patch(
   '/update-enrolled-course-marks',
-  auth('faculty'),
+  auth('superAdmin', 'admin', 'faculty'),
   validateRequest(
     EnrolledCourseValidations.updateEnrolledCourseMarksValidationZodSchema,
   ),
