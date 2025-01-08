@@ -5,9 +5,8 @@ import httpStatus from 'http-status';
 import { AcademicDepartmentServices } from './academicDepartment.service';
 
 const createAcademicDepartment = catchAsync(async (req, res) => {
-  const result = await AcademicDepartmentServices.createAcademicDepartmentIntoDB(
-    req.body,
-  );
+  const result =
+    await AcademicDepartmentServices.createAcademicDepartmentIntoDB(req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -17,20 +16,24 @@ const createAcademicDepartment = catchAsync(async (req, res) => {
   });
 });
 const getAllAcademicDepartments = catchAsync(async (req, res) => {
-  const result = await AcademicDepartmentServices.getAllAcademicDepartmentsFromDB();
+  const result =
+    await AcademicDepartmentServices.getAllAcademicDepartmentsFromDB(req.query);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Academic Departments are retrived successfully',
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 
 const getSingleAcademicDepartment = catchAsync(async (req, res) => {
   const { departmentId } = req.params;
   const result =
-    await AcademicDepartmentServices.getSingleAcademicDepartmentFromDB(departmentId);
+    await AcademicDepartmentServices.getSingleAcademicDepartmentFromDB(
+      departmentId,
+    );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -42,10 +45,11 @@ const getSingleAcademicDepartment = catchAsync(async (req, res) => {
 
 const updateAcademicDepartment = catchAsync(async (req, res) => {
   const { departmentId } = req.params;
-  const result = await AcademicDepartmentServices.updateAcademicDepartmentIntoDB(
-    departmentId,
-    req.body,
-  );
+  const result =
+    await AcademicDepartmentServices.updateAcademicDepartmentIntoDB(
+      departmentId,
+      req.body,
+    );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
